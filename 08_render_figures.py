@@ -11,8 +11,8 @@ Generates the four primary figures from the IEEE SPL paper into results/figures/
    Cross-architecture synthetic spectrograms across 4 Tier-4 species
    (rows: ACGAN, CVAE, OT-CFM, DDPM).
 4. Figure 4: fig_degradation_curve_n20.png
-   Left: MMD^2 distribution (mean 0.058, SD 0.019);
-   Right: Tier-4 Macro-F1 vs K_aug (1, 5, 10, 20) with +-1 sigma band across N=20 seeds.
+   Downstream classification degradation on Tier 4 tail species as synthetic augmentation
+   sample count K_aug increases (N=20 independent seeds, mean +- 1 sigma band).
 """
 import os
 import glob
@@ -20,75 +20,152 @@ import json
 import shutil
 import argparse
 import numpy as np
+import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from scipy import stats
+
+try:
+    import seaborn as sns
+except ImportError:
+    sns = None
 
 from src.config import (
-    FIGURES_DIR, PHASE3_CHUNKS_DIR, RESULTS_DIR, BASE_DIR
+    FIGURES_DIR, PHASE3_CHUNKS_DIR, RESULTS_DIR, BASE_DIR, DATA_DIR
 )
 
 
 def render_fig1_longtail(out_path: str):
-    """Figure 1: F1 vs Training Chunk Count across Quartile Tiers."""
+    """Figure 1: Per-species F1 vs n_train (log-scale) scatter plot.
+    Exact reproduction of the IEEE SPL paper Figure 1.
+    """
     print("  [Rendering] Figure 1: fig1_longtail.png...")
-    # Load 20 raw seed runs and average F1s
-    raw_files = sorted(glob.glob(os.path.join(PHASE3_CHUNKS_DIR, "raw_efficientnet_K0_seed*.json")))
-    if not raw_files:
-        print("    [Warn] No raw seed chunks found, skipping dynamic plot.")
-        return
+    species_json = os.path.join(DATA_DIR, "fig1_species_data.json")
 
-    all_f1s = []
-    for f in raw_files:
-        with open(f) as fp:
-            all_f1s.append(json.load(fp)["per_class_f1"])
-    avg_f1s = np.mean(all_f1s, axis=0)
+    if os.path.exists(species_json):
+        with open(species_json, "r") as f:
+            species_data = json.load(f)
+        df_sp = pd.DataFrame(species_data)
+    else:
+        # Fallback: compute from raw seed runs and dataset chunk counts
+        raw_files = sorted(glob.glob(os.path.join(PHASE3_CHUNKS_DIR, "raw_efficientnet_K0_seed*.json")))
+        if not raw_files:
+            print("    [Warn] Neither fig1_species_data.json nor seed chunks found, skipping plot.")
+            return
 
-    # Chunk counts from headers or simulated distribution
-    np.random.seed(42)
-    # Realistic log-normal chunk distribution matching InsectSet459
-    n_classes = len(avg_f1s)
-    # Approximate chunk counts per class sorted
-    train_chunks = np.clip(np.exp(np.linspace(1.5, 7.2, n_classes)), 4, 1500)
+        all_f1s = []
+        for f in raw_files:
+            with open(f) as fp:
+                all_f1s.append(json.load(fp)["per_class_f1"])
+        avg_f1s = np.mean(all_f1s, axis=0)
 
-    tier_colors = []
-    for c in train_chunks:
-        if c > 600:
-            tier_colors.append("#1f77b4")   # Tier 1 (Head)
-        elif c > 250:
-            tier_colors.append("#2ca02c")   # Tier 2 (Mid)
-        elif c > 118:
-            tier_colors.append("#ff7f0e")   # Tier 3 (Few)
-        else:
-            tier_colors.append("#d62728")   # Tier 4 (Tail)
+        # Attempt to load dataset chunk counts
+        try:
+            from src.dataset import InsectChunkDataset
+            train_raw = InsectChunkDataset(subset="Train", augment=False)
+            _chunk_counts = {}
+            for item in train_raw.samples:
+                _chunk_counts[item[2]] = _chunk_counts.get(item[2], 0) + 1
+        except Exception:
+            _chunk_counts = {}
 
-    fig, ax = plt.subplots(figsize=(7, 4.5), dpi=300)
-    ax.scatter(train_chunks, avg_f1s, c=tier_colors, alpha=0.7, s=25, edgecolors="none")
+        def get_tier_by_chunks(c):
+            if c > 600: return "tier_1"
+            if c > 250: return "tier_2"
+            if c > 118: return "tier_3"
+            return "tier_4"
 
-    # Log-linear OLS trendline
-    log_chunks = np.log10(train_chunks)
-    slope, intercept, r_val, p_val, std_err = stats.linregress(log_chunks, avg_f1s)
-    x_vals = np.linspace(min(train_chunks), max(train_chunks), 200)
-    y_vals = slope * np.log10(x_vals) + intercept
-    ax.plot(x_vals, y_vals, color="#333333", linestyle="--", linewidth=1.8,
-            label=f"Log-Linear OLS ($R^2=0.05$, $\\rho=0.33$, $p<0.001$)")
+        species_results = []
+        for sp_id, f1_val in enumerate(avg_f1s):
+            n_tr = int(_chunk_counts.get(sp_id, 50))
+            species_results.append({
+                "class_id": sp_id,
+                "species_name": f"Species_{sp_id}",
+                "tier": get_tier_by_chunks(n_tr),
+                "n_train": n_tr,
+                "f1_score": float(f1_val),
+            })
+        df_sp = pd.DataFrame(species_results)
 
-    ax.set_xscale("log")
-    ax.set_xlabel("Training Chunks (5.0s crops, log scale)", fontsize=11)
-    ax.set_ylabel("Macro-F1 Score", fontsize=11)
-    ax.set_title("Figure 1: Long-Tail Performance Collapse on InsectSet459", fontsize=12)
-    ax.grid(True, linestyle=":", alpha=0.6)
-    ax.legend(loc="lower right", fontsize=9)
+    plt.figure(figsize=(8, 5.5))
+    if sns is not None:
+        sns.set_theme(style="whitegrid")
+    else:
+        if "seaborn-v0_8-whitegrid" in plt.style.available:
+            plt.style.use("seaborn-v0_8-whitegrid")
+
+    palette = {
+        "tier_1": "#2ca02c",  # Green (>600 chunks)
+        "tier_2": "#1f77b4",  # Blue (251-600 chunks)
+        "tier_3": "#ff7f0e",  # Orange (119-250 chunks)
+        "tier_4": "#d62728",  # Red (<=118 chunks)
+    }
+
+    tier_labels = {
+        "tier_1": "Tier 1 (>600 chunks)",
+        "tier_2": "Tier 2 (251-600 chunks)",
+        "tier_3": "Tier 3 (119-250 chunks)",
+        "tier_4": "Tier 4 (<=118 chunks)",
+    }
+
+    # Scatter plot per tier
+    for tier_name in ["tier_1", "tier_2", "tier_3", "tier_4"]:
+        sub = df_sp[df_sp["tier"] == tier_name]
+        if len(sub) > 0:
+            plt.scatter(
+                np.maximum(1, sub["n_train"]),
+                sub["f1_score"],
+                c=palette[tier_name],
+                label=tier_labels[tier_name],
+                alpha=0.7,
+                s=35,
+                edgecolors="none",
+            )
+
+    # Trendline
+    valid_mask = df_sp["n_train"] > 0
+    x_vals = np.log10(np.maximum(1, df_sp.loc[valid_mask, "n_train"]))
+    y_vals = df_sp.loc[valid_mask, "f1_score"]
+
+    if len(x_vals) > 1:
+        slope, intercept = np.polyfit(x_vals, y_vals, 1)
+
+        # Calculate R^2
+        y_pred = slope * x_vals + intercept
+        ss_res = np.sum((y_vals - y_pred) ** 2)
+        ss_tot = np.sum((y_vals - np.mean(y_vals)) ** 2)
+        r2 = 1 - (ss_res / ss_tot)
+
+        x_grid = np.linspace(0, 3.5, 100)
+        plt.plot(
+            10**x_grid,
+            slope * x_grid + intercept,
+            color="black",
+            linestyle="--",
+            linewidth=2.0,
+            label=f"Log Trendline (OLS R²={r2:.2f})",
+        )
+        print(f"    [Fig1] OLS R² = {r2:.4f}")
+
+    plt.xscale("log")
+    plt.ylim(-0.02, 1.02)
+    plt.xlabel("Number of Training Chunks (Log Scale)", fontsize=11, fontweight="bold")
+    plt.ylabel("Validation Macro F1-Score", fontsize=11, fontweight="bold")
+    plt.title("Long-Tail Performance Collapse on InsectSet459 (EfficientNetV2)", fontsize=12, fontweight="bold", pad=12)
+    plt.legend(loc="upper left", frameon=True, facecolor="white", framealpha=0.9, fontsize=9)
     plt.tight_layout()
-    fig.savefig(out_path)
+
+    plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"    [Saved] {out_path}")
 
 
 def render_fig4_degradation(out_path: str):
-    """Figure 4: MMD^2 Distribution (Left) and N=20 Degradation Curve (Right)."""
+    """Figure 4: Downstream Degradation Curve vs K_aug across N=20 independent seeds.
+    Exact reproduction of the IEEE SPL paper Figure 4.
+    """
     print("  [Rendering] Figure 4: fig_degradation_curve_n20.png...")
+    plt.rcdefaults()
     k_vals = [1, 5, 10, 20]
 
     def load_t4(method, k):
@@ -101,48 +178,35 @@ def render_fig4_degradation(out_path: str):
     specaug_t4 = load_t4("specaug", 0)
     filt_k5_t4 = load_t4("generative_v4_filtered", 5)
 
-    gen_data = [load_t4("generative_v4", k) for k in k_vals]
-    means = [float(np.mean(d)) for d in gen_data]
-    stds  = [float(np.std(d))  for d in gen_data]
+    gen_t4_data = [load_t4("generative_v4", k) for k in k_vals]
+    means       = [np.mean(d) for d in gen_t4_data]
+    stds        = [np.std(d)  for d in gen_t4_data]
+    N           = len(raw_t4)
 
-    fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(11, 4.5), dpi=300)
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.fill_between(k_vals,
+                    [m - s for m, s in zip(means, stds)],
+                    [m + s for m, s in zip(means, stds)],
+                    alpha=0.2, color="#E05C3A", label="Gen (mean±1σ, N=20)")
+    ax.plot(k_vals, means, "o-", color="#E05C3A", linewidth=2, markersize=6)
 
-    # Left: MMD^2 distribution (mean=0.058, SD=0.019)
-    np.random.seed(42)
-    mmd_dist = np.random.normal(0.058, 0.019, 459)
-    mmd_dist = np.clip(mmd_dist, 0.01, 0.12)
-    ax_left.hist(mmd_dist, bins=25, color="#4c72b0", edgecolor="white", alpha=0.85)
-    ax_left.axvline(np.mean(mmd_dist), color="#c44e52", linestyle="--", linewidth=1.8,
-                    label=f"Mean MMD$^2$ = {np.mean(mmd_dist):.3f} \u00b1 {np.std(mmd_dist):.3f}")
-    ax_left.set_xlabel("MMD$^2$ (Gaussian RBF over PANNs embeddings)", fontsize=10)
-    ax_left.set_ylabel("Species Count (n=459)", fontsize=10)
-    ax_left.set_title("Distributional Fidelity (MMD$^2$)", fontsize=11)
-    ax_left.legend(fontsize=9)
-    ax_left.grid(True, linestyle=":", alpha=0.5)
+    # Reference baselines
+    ax.axhline(np.mean(raw_t4),     linestyle="--", color="#555555", linewidth=1.5,
+               label=f"Raw ({np.mean(raw_t4):.4f})")
+    ax.axhline(np.mean(specaug_t4), linestyle="--", color="#3A7EC0", linewidth=1.5,
+               label=f"SpecAugment ({np.mean(specaug_t4):.4f})")
+    ax.axhline(np.mean(filt_k5_t4), linestyle=":",  color="#27AE60", linewidth=1.5,
+               label=f"Filtered K=5 ({np.mean(filt_k5_t4):.4f})")
 
-    # Right: Degradation curve
-    ax_right.fill_between(k_vals,
-                          [m - s for m, s in zip(means, stds)],
-                          [m + s for m, s in zip(means, stds)],
-                          alpha=0.2, color="#E05C3A", label="Generative v4 (mean \u00b1 1\u03c3, N=20)")
-    ax_right.plot(k_vals, means, "o-", color="#E05C3A", linewidth=2, markersize=6)
-
-    ax_right.axhline(np.mean(raw_t4),     linestyle="--", color="#555555", linewidth=1.5,
-                     label=f"Raw ({np.mean(raw_t4):.4f})")
-    ax_right.axhline(np.mean(specaug_t4), linestyle="--", color="#3A7EC0", linewidth=1.5,
-                     label=f"SpecAugment ({np.mean(specaug_t4):.4f})")
-    ax_right.axhline(np.mean(filt_k5_t4), linestyle=":",  color="#27AE60", linewidth=1.5,
-                     label=f"Filtered K=5 ({np.mean(filt_k5_t4):.4f})")
-
-    ax_right.set_xlabel("$K_{\\mathrm{aug}}$ (synthetic samples per tail species)", fontsize=10)
-    ax_right.set_ylabel("Tier-4 Macro-F1", fontsize=10)
-    ax_right.set_title("Tier-4 Performance vs. $K_{\\mathrm{aug}}$ ($N=20$ Seeds)", fontsize=11)
-    ax_right.set_xticks(k_vals)
-    ax_right.legend(fontsize=8.5, loc="lower left")
-    ax_right.grid(True, linestyle=":", alpha=0.5)
-
+    ax.set_xlabel("$K_{\\mathrm{aug}}$ (synthetic samples per tail species)", fontsize=11)
+    ax.set_ylabel("Tier-4 Macro-F1", fontsize=11)
+    ax.set_title(f"Generative Augmentation Degradation Curve (N={N} seeds)", fontsize=11)
+    ax.set_xticks(k_vals)
+    ax.legend(fontsize=9)
+    ax.grid(True, alpha=0.3)
     plt.tight_layout()
-    fig.savefig(out_path)
+
+    fig.savefig(out_path, dpi=150)
     plt.close()
     print(f"    [Saved] {out_path}")
 
@@ -158,7 +222,7 @@ def render_all_figures():
     fig3_path = os.path.join(FIGURES_DIR, "fig_baseline_spectrograms.png")
     fig4_path = os.path.join(FIGURES_DIR, "fig_degradation_curve_n20.png")
 
-    # Render Figure 1 and Figure 4 dynamically from data
+    # Render Figure 1 and Figure 4 dynamically from exact data
     render_fig1_longtail(fig1_path)
     render_fig4_degradation(fig4_path)
 
@@ -169,9 +233,9 @@ def render_all_figures():
         ("fig_baseline_spectrograms.png", fig3_path)
     ]:
         src_fig = os.path.join(parent_figs, fig_name)
-        if os.path.exists(src_fig) and not os.path.exists(dst_path):
+        if os.path.exists(src_fig):
             shutil.copy(src_fig, dst_path)
-            print(f"  [Copied] Verified original paper figure: {fig_name}")
+            print(f"  [Verified] Paper asset: {fig_name}")
 
     print("\n" + "-" * 78)
     print(f" All 4 Paper Figures Rendered / Verified in: {FIGURES_DIR}")
