@@ -22,7 +22,6 @@ def run_claims_audit():
     print("=" * 80)
     print(" STEP 9: PROGRAMMATIC VERIFICATION & CLAIMS AUDIT SUITE")
     print(" Paper: 'When Fidelity Lies: Identity Collapse in Generative Augmentation...'")
-    print(" Venue: IEEE Signal Processing Letters (SPL)")
     print("=" * 80)
 
     audit_results = []

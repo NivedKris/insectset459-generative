@@ -1,6 +1,6 @@
 # When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale
 
-Official research repository and reproducibility kit for the paper published in the *IEEE Signal Processing Letters*:
+Official research repository and reproducibility kit for the manuscript:
 
 > **When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale**  
 > **Authors:** Nived Krishna$^1$ and Kala S$^{2,*}$, *Senior Member, IEEE*  
@@ -136,7 +136,6 @@ Running `./run.sh --step 9` programmatically verifies every numerical claim, tab
 ================================================================================
  STEP 9: PROGRAMMATIC VERIFICATION & CLAIMS AUDIT SUITE
  Paper: 'When Fidelity Lies: Identity Collapse in Generative Augmentation...'
- Venue: IEEE Signal Processing Letters (SPL)
 ================================================================================
 
 --- AUDITING TABLE II (Tier-wise SIPR, MMD^2, GCR, & Wilson CIs) ---
@@ -216,7 +215,7 @@ Running `./run.sh --step 9` programmatically verifies every numerical claim, tab
 @article{krishna2026fidelity,
   author    = {Krishna, Nived and Kala, S},
   title     = {When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale},
-  journal   = {IEEE Signal Processing Letters},
+  journal   = {IEEE Signal Processing Letters (Under Publication)},
   year      = {2026},
   url       = {https://github.com/NivedKris/insectset459-generative}
 }
