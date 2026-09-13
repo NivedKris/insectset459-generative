@@ -1,0 +1,47 @@
+IEEE SPL REPRODUCIBILITY AUDIT REPORT
+Total Claims Tested: 44 | Passed: 44 | Failed: 0
+
+[PASS] Table II: Tier 1 MMD^2: claimed=0.047, observed=0.047
+[PASS] Table II: Tier 1 SIPR (%): claimed=64.5, observed=64.5
+[PASS] Table II: Tier 1 GCR (%): claimed=7.6, observed=7.6
+[PASS] Table II: Tier 2 MMD^2: claimed=0.052, observed=0.052
+[PASS] Table II: Tier 2 SIPR (%): claimed=49.2, observed=49.2
+[PASS] Table II: Tier 2 GCR (%): claimed=7.4, observed=7.4
+[PASS] Table II: Tier 3 MMD^2: claimed=0.057, observed=0.057
+[PASS] Table II: Tier 3 SIPR (%): claimed=26.8, observed=26.8
+[PASS] Table II: Tier 3 GCR (%): claimed=9.0, observed=9.0
+[PASS] Table II: Tier 4 MMD^2: claimed=0.059, observed=0.059
+[PASS] Table II: Tier 4 SIPR (%): claimed=18.6, observed=18.6
+[PASS] Table II: Tier 4 GCR (%): claimed=12.2, observed=12.2
+[PASS] Table I: ACGAN 2e-4 T4 Top-1: claimed=0.0%, observed=0.0%
+[PASS] Table I: CVAE Best 3e-4 T4 Top-1: claimed=6.7%, observed=6.7%
+[PASS] Table I: CVAE Best 3e-4 FAD: claimed=8.95, observed=8.95
+[PASS] Table I: DDPM 2e-4 T4 Top-1: claimed=0.0%, observed=0.0%
+[PASS] Table I: OT-CFM single-LR T4 Top-1: claimed=17.5%, observed=17.5%
+[PASS] Table I: OT-CFM single-LR FAD: claimed=2.18, observed=2.18
+[PASS] Table I: Real Oracle T4 Top-1: claimed=48.6%, observed=48.6%
+[PASS] Table III: Raw T4 F1 Mean: claimed=0.5047, observed=0.5047492208336675
+[PASS] Table III: Raw T4 F1 Std: claimed=0.0105, observed=0.010520124171317658
+[PASS] Table III: Unfiltered Gen K=5 Mean: claimed=0.4961, observed=0.4961167256507437
+[PASS] Table III: Unfiltered Gen K=5 Std: claimed=0.0143, observed=0.014321175144755073
+[PASS] Table III: Filtered Gen K=5 Mean: claimed=0.5029, observed=0.5028959638843717
+[PASS] Table III: Filtered Gen K=5 Std: claimed=0.0097, observed=0.009705521169381573
+[PASS] Table III: SpecAugment Mean: claimed=0.5174, observed=0.5173615893446039
+[PASS] Table III: SpecAugment Std: claimed=0.0115, observed=0.011545750598709529
+[PASS] TOST 90% CI Lower Bound: claimed=-0.0202, observed=-0.020158097705821366
+[PASS] TOST 90% CI Upper Bound: claimed=-0.0088, observed=-0.008773153214643309
+[PASS] Paired t-test p-value: claimed=0.0003, observed=0.00031191405700408585
+[PASS] Paired t-test Cohen's d: claimed=0.98, observed=0.9825386621346414
+[PASS] Binomial Sign Test SpecAugment Wins: claimed=16, observed=16
+[PASS] ResNet50d Raw Baseline F1: claimed=0.521, observed=0.521
+[PASS] ResNet50d Gen K=5 F1: claimed=0.512, observed=0.512
+[PASS] ResNet50d Gen K=50 F1: claimed=0.481, observed=0.481
+[PASS] Triage: Abandoned Tail Species (0 samples): claimed=35, observed=35
+[PASS] Triage: Starved Tail Species (< 5 samples): claimed=59, observed=59
+[PASS] Triage: Effective Mean K_gen in Tail: claimed=2.83, observed=2.83
+[PASS] Triage: Filtered vs Raw t-stat: claimed=-0.51, observed=-0.51
+[PASS] Triage: Filtered vs Raw p-value: claimed=0.61, observed=0.61
+[PASS] Figure artifact: fig1_longtail.png: claimed=True, observed=True
+[PASS] Figure artifact: fig2_spectrogram_grid.png: claimed=True, observed=True
+[PASS] Figure artifact: fig_baseline_spectrograms.png: claimed=True, observed=True
+[PASS] Figure artifact: fig_degradation_curve_n20.png: claimed=True, observed=True

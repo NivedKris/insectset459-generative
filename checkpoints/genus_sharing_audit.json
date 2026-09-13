@@ -1,0 +1,11 @@
+{
+  "n_species_analyzed": 459,
+  "n_multi_species_genera": 74,
+  "mean_within_genus_cosine_distance": 0.17398901283740997,
+  "std_within_genus_cosine_distance": 0.09421295672655106,
+  "mean_cross_genus_cosine_distance": 0.18229231238365173,
+  "std_cross_genus_cosine_distance": 0.09698908030986786,
+  "distance_reduction_pct": 4.554936759355311,
+  "p_value": 0.006428716238588095,
+  "hypothesis_supported": true
+}

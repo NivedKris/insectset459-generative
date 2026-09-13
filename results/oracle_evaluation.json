@@ -1,0 +1,13 @@
+{
+  "architecture": "EfficientNetV2-S",
+  "checkpoint": "/home/shubhamkumar-pg/iclr/IEEE SPL/checkpoints/oracle/best_oracle.pt",
+  "metrics": {
+    "tier4_top1": 0.486,
+    "tier4_top5": 0.765,
+    "all_top1": 0.682,
+    "all_top5": 0.874,
+    "tier1_top1": 0.785,
+    "tier2_top1": 0.492,
+    "tier3_top1": 0.354
+  }
+}

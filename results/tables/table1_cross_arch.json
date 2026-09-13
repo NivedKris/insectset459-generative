@@ -1,0 +1,112 @@
+{
+  "rows": [
+    {
+      "generator": "ACGAN (8.1M)",
+      "lr_sweep": "2e-4 (default)",
+      "fad": "11.40",
+      "tier4_top1": "0.0%",
+      "tier4_top5": "0.0%",
+      "all_top1": "1.7%",
+      "all_top5": "4.7%"
+    },
+    {
+      "generator": "ACGAN (8.1M)",
+      "lr_sweep": "1e-3",
+      "fad": "---",
+      "tier4_top1": "0.0%",
+      "tier4_top5": "0.3%",
+      "all_top1": "0.2%",
+      "all_top5": "0.9%"
+    },
+    {
+      "generator": "ACGAN (8.1M)",
+      "lr_sweep": "5e-5",
+      "fad": "---",
+      "tier4_top1": "0.0%",
+      "tier4_top5": "0.0%",
+      "all_top1": "0.0%",
+      "all_top5": "1.0%"
+    },
+    {
+      "generator": "CVAE (16.2M)",
+      "lr_sweep": "Best (3e-4)",
+      "fad": "8.95",
+      "tier4_top1": "6.7%",
+      "tier4_top5": "17.7%",
+      "all_top1": "7.4%",
+      "all_top5": "18.0%"
+    },
+    {
+      "generator": "CVAE (16.2M)",
+      "lr_sweep": "1e-3",
+      "fad": "---",
+      "tier4_top1": "0.9%",
+      "tier4_top5": "2.8%",
+      "all_top1": "2.2%",
+      "all_top5": "6.2%"
+    },
+    {
+      "generator": "CVAE (16.2M)",
+      "lr_sweep": "2e-4",
+      "fad": "---",
+      "tier4_top1": "0.5%",
+      "tier4_top5": "1.5%",
+      "all_top1": "0.4%",
+      "all_top5": "1.9%"
+    },
+    {
+      "generator": "CVAE (16.2M)",
+      "lr_sweep": "5e-5",
+      "fad": "---",
+      "tier4_top1": "0.2%",
+      "tier4_top5": "1.0%",
+      "all_top1": "0.3%",
+      "all_top5": "1.0%"
+    },
+    {
+      "generator": "DDPM (1.0M)",
+      "lr_sweep": "2e-4 (default)",
+      "fad": "4.12",
+      "tier4_top1": "0.0%",
+      "tier4_top5": "0.0%",
+      "all_top1": "0.2%",
+      "all_top5": "1.1%"
+    },
+    {
+      "generator": "DDPM (1.0M)",
+      "lr_sweep": "1e-3",
+      "fad": "---",
+      "tier4_top1": "0.0%",
+      "tier4_top5": "0.1%",
+      "all_top1": "0.3%",
+      "all_top5": "1.1%"
+    },
+    {
+      "generator": "DDPM (1.0M)",
+      "lr_sweep": "5e-5",
+      "fad": "---",
+      "tier4_top1": "0.0%",
+      "tier4_top5": "0.0%",
+      "all_top1": "0.2%",
+      "all_top5": "1.3%"
+    },
+    {
+      "generator": "OT-CFM (Ours)",
+      "lr_sweep": "single-LR",
+      "fad": "2.18",
+      "tier4_top1": "17.5%",
+      "tier4_top5": "40.4%",
+      "all_top1": "37.0%",
+      "all_top5": "58.7%"
+    },
+    {
+      "generator": "Real Data Oracle",
+      "lr_sweep": "---",
+      "fad": "---",
+      "tier4_top1": "48.6%",
+      "tier4_top5": "76.5%",
+      "all_top1": "68.2%",
+      "all_top5": "87.4%"
+    }
+  ]
+}

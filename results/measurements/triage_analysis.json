@@ -1,0 +1,22 @@
+{
+  "cache": {
+    "total": 22950,
+    "surviving": 8470,
+    "survival_pct": 36.9,
+    "discard_pct": 63.1
+  },
+  "tier4_triage": {
+    "total_species": 115,
+    "abandoned_species_0": 35,
+    "scarce_species_lt5": 59,
+    "usable_species_gte5": 21,
+    "nominal_kgen": 50,
+    "effective_kgen_mean": 2.83
+  },
+  "statistical_test_filtered_vs_raw": {
+    "f1_shift": -0.0018,
+    "t_stat": -0.51,
+    "p_value": 0.61,
+    "cohens_d": -0.11
+  }
+}

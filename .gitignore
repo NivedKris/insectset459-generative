@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# PyTorch checkpoints and large caches (>100MB prevention)
+*.pt.tmp
+*.tar.gz
+*.zip
+*.tar
+*cache_v4_ep40.pt
+*cache_v4_filtered.pt
+
+# Data raw audio
+data/insectset459/raw_audio/
+data/audio/
+Train.zip
+Test.zip
+Validation.zip
+
+# Logs and system artifacts
+*.log
+.DS_Store
+.pytest_cache/

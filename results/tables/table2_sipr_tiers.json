@@ -1,0 +1,104 @@
+{
+  "table2": {
+    "Tier 1 (Head)": {
+      "n_synth": 3650,
+      "mmd2": 0.047,
+      "sipr_pct": 64.5,
+      "sipr_ci": [
+        63.0,
+        66.0
+      ],
+      "gcr_pct": 7.6,
+      "gcr_ci": [
+        6.8,
+        8.5
+      ],
+      "computed_sipr_ci": [
+        62.9,
+        66.0
+      ],
+      "computed_gcr_ci": [
+        6.8,
+        8.5
+      ]
+    },
+    "Tier 2 (Mid)": {
+      "n_synth": 6300,
+      "mmd2": 0.052,
+      "sipr_pct": 49.2,
+      "sipr_ci": [
+        48.0,
+        50.4
+      ],
+      "gcr_pct": 7.4,
+      "gcr_ci": [
+        6.8,
+        8.1
+      ],
+      "computed_sipr_ci": [
+        48.0,
+        50.4
+      ],
+      "computed_gcr_ci": [
+        6.8,
+        8.1
+      ]
+    },
+    "Tier 3 (Few)": {
+      "n_synth": 7250,
+      "mmd2": 0.057,
+      "sipr_pct": 26.8,
+      "sipr_ci": [
+        25.8,
+        27.8
+      ],
+      "gcr_pct": 9.0,
+      "gcr_ci": [
+        8.4,
+        9.7
+      ],
+      "computed_sipr_ci": [
+        25.8,
+        27.8
+      ],
+      "computed_gcr_ci": [
+        8.4,
+        9.7
+      ]
+    },
+    "Tier 4 (Tail)": {
+      "n_synth": 5750,
+      "mmd2": 0.059,
+      "sipr_pct": 18.6,
+      "sipr_ci": [
+        17.6,
+        19.6
+      ],
+      "gcr_pct": 12.2,
+      "gcr_ci": [
+        11.4,
+        13.1
+      ],
+      "computed_sipr_ci": [
+        17.6,
+        19.6
+      ],
+      "computed_gcr_ci": [
+        11.4,
+        13.1
+      ]
+    }
+  },
+  "identity_collapse": {
+    "real_oracle_t4": 48.6,
+    "synthetic_t4": 18.6,
+    "gap": 30.0,
+    "is_collapsed": true
+  },
+  "correlation": {
+    "spearman_rho": -0.026,
+    "spearman_p": 0.5846740971664102,
+    "pearson_r": -0.026595265590296336,
+    "pearson_p": 0.5698099319835884
+  }
+}

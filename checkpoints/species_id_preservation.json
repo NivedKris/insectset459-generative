@@ -1,0 +1,22 @@
+{
+  "T1 (Head)": {
+    "total_samples": 3650,
+    "species_id_preservation_rate": 0.6454794520547945,
+    "genus_confusion_rate": 0.07643835616438356
+  },
+  "T2 (Mid)": {
+    "total_samples": 6300,
+    "species_id_preservation_rate": 0.49206349206349204,
+    "genus_confusion_rate": 0.07412698412698412
+  },
+  "T3 (Few)": {
+    "total_samples": 7250,
+    "species_id_preservation_rate": 0.26813793103448275,
+    "genus_confusion_rate": 0.0896551724137931
+  },
+  "T4 (Tail)": {
+    "total_samples": 5750,
+    "species_id_preservation_rate": 0.18608695652173912,
+    "genus_confusion_rate": 0.1222608695652174
+  }
+}
