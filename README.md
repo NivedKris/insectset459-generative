@@ -33,27 +33,145 @@ While generators achieve low batch-level distributional distance (Fréchet Audio
 
 ---
 
-## Quick Start & Reproduction
+## 🚀 Execution Guide & Operational Modes
 
-The kit includes a master runner script (`run.sh`) that provisions the environment and executes the pipeline in under 30 seconds:
+This repository can be executed in multiple ways depending on whether the user seeks rapid numerical verification, full retraining from scratch, targeted single-step inspection, or direct Python module execution.
 
+---
+
+### Method 1: Master Universal Runner (`run.sh`)
+
+The universal bash script [`run.sh`](run.sh) automatically inspects system hardware (CPU/GPU, VRAM, free storage), configures the Python virtual environment, installs dependencies, and runs the designated pipeline mode.
+
+#### Mode 1A: Fast Verification Mode (Default, < 30 Seconds)
+Reproduces all paper tables (Tables I, II, III), generates bit-for-bit identical figures (Figures 1, 2, 3, 4), computes all statistical tests (TOST, paired $t$-test, sign test, Wilson CIs, deflated $z$-tests), and executes the 113-claim audit suite using pre-computed inference checkpoints:
 ```bash
-# Clone the repository
-git clone https://github.com/NivedKris/insectset459-generative.git
-cd insectset459-generative
-
-# Execute the master reproduction script in fast verification mode
+# Default execution (runs fast verification automatically)
 ./run.sh
+
+# Or explicitly via flag:
+./run.sh --quick
 ```
 
-### Operational Modes
+#### Mode 1B: Full Retraining Mode (From Scratch)
+Trains all models from raw InsectSet459 audio:
+1. Trains the 20.3M EfficientNetV2-S oracle ceiling classifier (50 epochs, cosine schedule).
+2. Trains all four generative models (OT-CFM with 640-d taxonomic FiLM, DDPM, CVAE, ACGAN) across their learning rate sweeps.
+3. Generates 22,950 conditional spectrograms via 50-step Euler ODE numerical integration.
+4. Executes the complete downstream classification sweep across $N=20$ independent seeds.
+```bash
+./run.sh --full
+# Or equivalently:
+./run.sh --train
+```
+> **Hardware Requirement:** NVIDIA GPU with $\ge 24$ GB VRAM (e.g., A40, RTX 3090, RTX 4090, A100).
 
-- **Fast Verification Mode (`./run.sh` or `./run.sh --quick`) [Default]:**
-  Evaluates trained checkpoints across all models, generates exact numerical results for Tables I, II, and III, computes exact statistical tests (TOST, paired $t$-test, sign test, Wilson CIs, deflated $z$-tests), renders all publication-quality figures, and executes an automated 113-point verification audit against `main.tex`. Runtime: $< 30$ seconds.
-- **Full Retraining Mode (`./run.sh --full` or `./run.sh --train`):**
-  Executes full training from scratch on InsectSet459: trains the EfficientNetV2-S oracle classifier, trains all four generative models (OT-CFM, DDPM, CVAE, ACGAN), performs ODE conditional sampling, and runs the downstream $N=20$ paired classification seed sweep. Hardware requirement: NVIDIA GPU with $\ge 24$ GB VRAM (e.g., A40, RTX 3090/4090, A100).
-- **Single Step Execution (`./run.sh --step <N>`):**
-  Executes any individual stage of the pipeline ($N \in \{1, \dots, 9\}$).
+#### Mode 1C: Granular Single-Step Execution
+Any individual phase of the research workflow can be triggered using the `--step <N>` flag:
+
+| Command | Target Pipeline Stage | Output Produced |
+| :--- | :--- | :--- |
+| `./run.sh --step 1` | **Dataset Setup & Split Audit** | Validates 60/20/20 recording split, chunk tiers, and audio specs |
+| `./run.sh --step 2` | **Oracle Classifier Ceiling** | Evaluates real-data Top-1/Top-5 ceiling (`results/oracle_evaluation.json`) |
+| `./run.sh --step 3` | **Generative Architecture Suite** | Verifies model parameter counts and samples test spectrograms |
+| `./run.sh --step 4` | **SIPR, MMD², GCR & Collapse** | Generates **Table II** (`results/tables/table2_sipr_tiers.json`) & deflated $z$-test |
+| `./run.sh --step 5` | **Cross-Architecture Replication** | Generates **Table I** (`results/tables/table1_cross_arch.json`) across LR sweeps |
+| `./run.sh --step 6` | **Confidence Triage Analysis** | Quantifies 63.1% discard rate & 35 abandoned tail species |
+| `./run.sh --step 7` | **Downstream $N=20$ & TOST** | Generates **Table III** (`results/tables/table3_tier4_f1.json`) & equivalence stats |
+| `./run.sh --step 8` | **Render Paper Figures** | Renders all 4 publication figures into `results/figures/` |
+| `./run.sh --step 9` | **Automated Claims Audit Suite** | Validates all 113 claims directly against `main.tex` |
+
+---
+
+### Method 2: Direct Standalone Python Execution
+
+Researchers who prefer working directly in Python without shell scripts can activate their virtual environment and invoke any stage as an independent script:
+
+```bash
+# Activate your environment (e.g., venv or conda)
+source .venv/bin/activate
+
+# 1. Inspect splits, taxonomy, and quartile chunk counts
+python 01_dataset_setup.py
+
+# 2. Evaluate the frozen real-data oracle classifier
+python 02_oracle_eval.py
+
+# 3. Test conditional generation with OT-CFM, DDPM, CVAE, and ACGAN
+python 03_generative_models.py
+
+# 4. Measure SIPR, MMD², Genus Confusion Rate, and reproduce Table II
+python 04_measure_sipr.py
+
+# 5. Replicate cross-architecture LR sweeps and reproduce Table I
+python 05_cross_arch_eval.py
+
+# 6. Run oracle confidence triage analysis
+python 06_triage_analysis.py
+
+# 7. Evaluate N=20 paired seeds, run TOST equivalence, and reproduce Table III
+python 07_downstream_and_tost.py
+
+# 8. Render all four high-resolution figures into results/figures/
+python 08_render_figures.py
+
+# 9. Run the full 113-point claims audit suite
+python 09_audit_paper_claims.py
+```
+
+---
+
+### Method 3: Reproducing Specific Results On Demand
+
+If you only need to inspect or replicate a particular result from the manuscript:
+
+- **To reproduce Table I (Cross-Architecture Baselines):**
+  ```bash
+  python 05_cross_arch_eval.py
+  # Output: results/tables/table1_cross_arch.json
+  ```
+- **To reproduce Table II (Tier-wise MMD², SIPR, GCR, & Wilson CIs):**
+  ```bash
+  python 04_measure_sipr.py
+  # Output: results/tables/table2_sipr_tiers.json
+  ```
+- **To reproduce Table III (Downstream F1, TOST Equivalence, & ResNet50d):**
+  ```bash
+  python 07_downstream_and_tost.py
+  # Output: results/tables/table3_tier4_f1.json
+  ```
+- **To reproduce all Figures (Figs 1, 2, 3, 4):**
+  ```bash
+  python 08_render_figures.py
+  # Output: results/figures/ (fig1_longtail.png, fig2_spectrogram_grid.png, etc.)
+  ```
+- **To run the 113-Point Claims Verification:**
+  ```bash
+  python 09_audit_paper_claims.py
+  # Output: results/audit_report.txt
+  ```
+
+---
+
+### Environment Setup Alternatives
+
+The repository is self-contained. If setting up a fresh environment manually:
+
+```bash
+# Option A: Standard Python venv
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Option B: Ultra-fast uv package manager
+uv venv .venv
+uv pip install -r requirements.txt
+
+# Option C: Conda / Mamba
+conda create -n bioacoustics python=3.11 -y
+conda activate bioacoustics
+pip install -r requirements.txt
+```
 
 ---
 
