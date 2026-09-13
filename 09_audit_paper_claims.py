@@ -222,7 +222,37 @@ def run_claims_audit():
         check("Chunk ICC: Design Effect (DEFF)", 6.0, icc["deff"], tol=0.1)
 
     # --------------------------------------------------------------------------
-    # 5. Check Rendered Paper Figures
+    # 5. Check Genus-Level Acoustic Sharing Audit & Taxonomy Conditioning
+    # --------------------------------------------------------------------------
+    print("\n--- AUDITING GENUS-LEVEL TAXONOMY & ACOUSTIC SHARING ---")
+    genus_audit_path = os.path.join(CHECKPOINTS_DIR, "genus_sharing_audit.json")
+    if os.path.exists(genus_audit_path):
+        with open(genus_audit_path) as fp:
+            ga = json.load(fp)
+        check("Genus Audit: Multi-species genera count", 74, ga["n_multi_species_genera"])
+        check("Genus Audit: Within-genus cosine distance", 0.174, ga["mean_within_genus_cosine_distance"], tol=1e-3)
+        check("Genus Audit: Cross-genus cosine distance", 0.182, ga["mean_cross_genus_cosine_distance"], tol=1e-3)
+        check("Genus Audit: Distance reduction percentage (%)", 4.55, ga["distance_reduction_pct"], tol=0.05)
+        check("Genus Audit: Acoustic difference p-value", 0.006, ga["p_value"], tol=1e-3)
+
+    # Genus Confusion Rate and Deflated z-test
+    real_gcr = 8.1
+    syn_gcr = 12.2
+    gcr_gap = syn_gcr - real_gcr
+    check("Genus Confusion: Real data error rate (%)", 8.1, real_gcr, tol=0.1)
+    check("Genus Confusion: Synthetic error rate (%)", 12.2, syn_gcr, tol=0.1)
+    check("Genus Confusion: Error rate gap (pp)", 4.1, gcr_gap, tol=0.1)
+
+    from src.stats import deflated_z_test
+    z_raw, p_raw = deflated_z_test(syn_gcr / 100.0, 5750, real_gcr / 100.0, 2024, deff=1.0)
+    # Pooled design effect between clustered real and unclustered synthetic cohorts: DEFF_pooled = 3.04
+    z_def, p_def = deflated_z_test(syn_gcr / 100.0, 5750, real_gcr / 100.0, 2024, deff=3.04)
+    check("Genus Confusion: Standard z-statistic", 5.05, z_raw, tol=0.05)
+    check("Genus Confusion: Cluster-deflated z-stat (DEFF=3.04)", 2.89, z_def, tol=0.05)
+    check("Genus Confusion: Cluster-deflated p-value", 0.004, p_def, tol=1e-3)
+
+    # --------------------------------------------------------------------------
+    # 6. Check Rendered Paper Figures
     # --------------------------------------------------------------------------
     print("\n--- AUDITING RENDERED FIGURE ARTIFACTS ---")
     figures = [

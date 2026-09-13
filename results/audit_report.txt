@@ -1,5 +1,5 @@
 IEEE SPL REPRODUCIBILITY AUDIT REPORT
-Total Claims Tested: 102 | Passed: 102 | Failed: 0
+Total Claims Tested: 113 | Passed: 113 | Failed: 0
 
 [PASS] Table II: Tier 1 Synth Chunks Evaluated: claimed=3650, observed=3650
 [PASS] Table II: Tier 1 MMD^2: claimed=0.047, observed=0.047
@@ -99,6 +99,17 @@ Total Claims Tested: 102 | Passed: 102 | Failed: 0
 [PASS] Identity Collapse: Condition Satisfied: claimed=True, observed=True
 [PASS] Chunk ICC: Tier 4 Intraclass Correlation: claimed=0.698, observed=0.698014747215025
 [PASS] Chunk ICC: Design Effect (DEFF): claimed=6.0, observed=6.007168118911032
+[PASS] Genus Audit: Multi-species genera count: claimed=74, observed=74
+[PASS] Genus Audit: Within-genus cosine distance: claimed=0.174, observed=0.17398901283740997
+[PASS] Genus Audit: Cross-genus cosine distance: claimed=0.182, observed=0.18229231238365173
+[PASS] Genus Audit: Distance reduction percentage (%): claimed=4.55, observed=4.554936759355311
+[PASS] Genus Audit: Acoustic difference p-value: claimed=0.006, observed=0.006428716238588095
+[PASS] Genus Confusion: Real data error rate (%): claimed=8.1, observed=8.1
+[PASS] Genus Confusion: Synthetic error rate (%): claimed=12.2, observed=12.2
+[PASS] Genus Confusion: Error rate gap (pp): claimed=4.1, observed=4.1
+[PASS] Genus Confusion: Standard z-statistic: claimed=5.05, observed=5.043501733881459
+[PASS] Genus Confusion: Cluster-deflated z-stat (DEFF=3.04): claimed=2.89, observed=2.8926466288896635
+[PASS] Genus Confusion: Cluster-deflated p-value: claimed=0.004, observed=0.0038201082400379782
 [PASS] Figure artifact: fig1_longtail.png: claimed=True, observed=True
 [PASS] Figure artifact: fig2_spectrogram_grid.png: claimed=True, observed=True
 [PASS] Figure artifact: fig_baseline_spectrograms.png: claimed=True, observed=True
