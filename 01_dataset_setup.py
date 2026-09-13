@@ -104,7 +104,7 @@ def setup_dataset(mode: str = "quick"):
     print(f" {'Tier 3 (Few)':<16} | {len(tier_species['tier_3']):<14} | {'119 - 250 chunks':<28} | {'Scarce'}")
     print(f" {'Tier 4 (Tail)':<16} | {len(tier_species['tier_4']):<14} | {'<= 118 chunks':<28} | {'Extreme Long-Tail'}")
     print("-" * 78)
-    print("  Note: Tier 4 is the primary focus of this paper, containing 115 rarest species.")
+    print("  Note: Tier 4 is the primary focus of this benchmark, containing 115 rarest species.")
 
     # 4. Audio Pipeline Demonstration
     print("\n[Preprocessing] Testing log-mel spectrogram extraction pipeline...")

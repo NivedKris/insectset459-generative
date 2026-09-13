@@ -1,18 +1,12 @@
 # When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale
 
-Official research repository and reproducibility kit for the manuscript:
-
-> **When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale**  
-> **Authors:** Nived Krishna$^1$ and Kala S$^{2,*}$, *Senior Member, IEEE*  
-> $^1$*Department of Computer Science & Engineering, Indian Institute of Technology Kharagpur, India*  
-> $^2$*Department of Electronics & Communication Engineering, Indian Institute of Information Technology Kottayam, India*  
-> **Paper & Code:** [https://github.com/NivedKris/insectset459-generative](https://github.com/NivedKris/insectset459-generative)
+Benchmarking and reproducibility codebase for investigating generative data augmentation, species-identity preservation (SIPR), and long-tail performance collapse on the 459-species InsectSet459 bioacoustic dataset.
 
 ---
 
-## Abstract
+## Overview
 
-Generative augmentation is widely employed to address extreme class imbalance in long-tail recognition, yet its behavior at extreme taxonomical scale (hundreds of fine-grained species) has remained largely unquantified. In this paper, we evaluate conditional generative models (Optimal Transport Conditional Flow Matching, Diffusion Probabilistic Models, Conditional Variational Autoencoders, and Auxiliary Classifier GANs) on **InsectSet459**, an extreme long-tail benchmark comprising 459 insect species. 
+Generative augmentation is widely employed to address extreme class imbalance in long-tail recognition, yet its behavior at extreme taxonomical scale (hundreds of fine-grained species) has remained largely unquantified. Here, we evaluate conditional generative models (Optimal Transport Conditional Flow Matching, Diffusion Probabilistic Models, Conditional Variational Autoencoders, and Auxiliary Classifier GANs) on **InsectSet459**, an extreme long-tail benchmark comprising 459 insect species. 
 
 While generators achieve low batch-level distributional distance (Fréchet Audio Distance and Maximum Mean Discrepancy, $\text{MMD}^2 = 0.058 \pm 0.019$), per-sample class-identity verification reveals a severe pathology: **Species-Identity Preservation Rate (SIPR)** collapses from **64.5%** on head species to **18.6%** on tail species (compared to a real-data oracle baseline of **48.6%**). We term this phenomenon **identity collapse** and demonstrate that it is architecture-general across all four generative families. Post-hoc confidence filtering discards 63.1% of generated data, abandoning 35 of 115 tail species entirely. In a pre-registered $N=20$ independent-seed equivalence audit, Two One-Sided Tests (TOST, $\pm 0.020$ margin) prove inconclusive, while paired significance testing ($p = 0.0003, d = 0.98$) demonstrates that even filtered generative augmentation is statistically outperformed by zero-cost spectral masking (SpecAugment).
 
@@ -44,7 +38,7 @@ This repository can be executed in multiple ways depending on whether the user s
 The universal bash script [`run.sh`](run.sh) automatically inspects system hardware (CPU/GPU, VRAM, free storage), configures the Python virtual environment, installs dependencies, and runs the designated pipeline mode.
 
 #### Mode 1A: Fast Verification Mode (Default, < 30 Seconds)
-Reproduces all paper tables (Tables I, II, III), generates bit-for-bit identical figures (Figures 1, 2, 3, 4), computes all statistical tests (TOST, paired $t$-test, sign test, Wilson CIs, deflated $z$-tests), and executes the 113-claim audit suite using pre-computed inference checkpoints:
+Reproduces all benchmark evaluation tables (Tables I, II, III), generates bit-for-bit identical figures (Figures 1, 2, 3, 4), computes all statistical tests (TOST, paired $t$-test, sign test, Wilson CIs, deflated $z$-tests), and executes the 113-claim audit suite using pre-computed inference checkpoints:
 ```bash
 # Default execution (runs fast verification automatically)
 ./run.sh
@@ -78,8 +72,8 @@ Any individual phase of the research workflow can be triggered using the `--step
 | `./run.sh --step 5` | **Cross-Architecture Replication** | Generates **Table I** (`results/tables/table1_cross_arch.json`) across LR sweeps |
 | `./run.sh --step 6` | **Confidence Triage Analysis** | Quantifies 63.1% discard rate & 35 abandoned tail species |
 | `./run.sh --step 7` | **Downstream $N=20$ & TOST** | Generates **Table III** (`results/tables/table3_tier4_f1.json`) & equivalence stats |
-| `./run.sh --step 8` | **Render Paper Figures** | Renders all 4 publication figures into `results/figures/` |
-| `./run.sh --step 9` | **Automated Claims Audit Suite** | Validates all 113 claims directly against `main.tex` |
+| `./run.sh --step 8` | **Render Figures** | Renders all 4 figures into `results/figures/` |
+| `./run.sh --step 9` | **Automated Claims Audit Suite** | Validates all 113 claims against experimental logs |
 
 ---
 
@@ -123,7 +117,7 @@ python 09_audit_paper_claims.py
 
 ### Method 3: Reproducing Specific Results On Demand
 
-If you only need to inspect or replicate a particular result from the manuscript:
+If you only need to inspect or replicate a particular result:
 
 - **To reproduce Table I (Cross-Architecture Baselines):**
   ```bash
@@ -177,7 +171,7 @@ pip install -r requirements.txt
 
 ## Pre-Trained Checkpoints & Model Architecture
 
-The repository provides standalone inference weights for all models evaluated in the paper:
+The repository provides standalone inference weights for all evaluated models:
 
 | Model Architecture | File Path | Parameter Count | Resolution / Input | Description |
 | :--- | :--- | :---: | :---: | :--- |
@@ -206,7 +200,7 @@ IEEE SPL/
 ├── 05_cross_arch_eval.py           # Step 5: Cross-architecture LR sweep replication (Table I)
 ├── 06_triage_analysis.py           # Step 6: Oracle confidence triage & tail starvation audit
 ├── 07_downstream_and_tost.py       # Step 7: N=20 downstream Macro-F1 & TOST equivalence (Table III)
-├── 08_render_figures.py            # Step 8: Publication-quality figure generation (Figs 1–4)
+├── 08_render_figures.py            # Step 8: High-resolution figure renderer (Figs 1–4)
 ├── 09_audit_paper_claims.py        # Step 9: Programmatic verification suite (113 claims)
 ├── src/                            # Research library
 │   ├── config.py                   # Global constants, taxonomy, and paths
@@ -236,24 +230,24 @@ IEEE SPL/
 - **Step 7: Downstream Augmentation & TOST Equivalence (`07_downstream_and_tost.py`):**
   Aggregates $N=20$ independent paired seeds for Table III: Raw ($0.5047 \pm 0.0105$), Unfiltered Gen ($0.4961 \pm 0.0143$), Filtered Gen ($0.5029 \pm 0.0097$), and SpecAugment ($0.5174 \pm 0.0115$). Computes TOST 90% CI ($[-0.0202, -0.0088]$), paired $t$-test ($p=0.0003, d=0.98$), and sign test (16/20 wins, $p=0.012$). Replicates monotonic degradation on ResNet50d ($0.521 \to 0.512 \to 0.481$).
 - **Step 8: High-Resolution Figure Rendering (`08_render_figures.py`):**
-  Renders publication figures matching the paper bit-for-bit:
+  Renders figures matching the findings bit-for-bit:
   - `fig1_longtail.png`: F1 vs. training chunk count for 459 species with quartile tiers and OLS trendline ($R^2=0.05, \rho=0.33$).
   - `fig2_spectrogram_grid.png`: Real vs. unfiltered synthetic spectrogram pairs for Tier-4 species.
   - `fig_baseline_spectrograms.png`: Cross-architecture synthetic spectrogram grid ($4 \times 4$).
   - `fig_degradation_curve_n20.png`: Tier-4 Macro-F1 degradation curve vs. $K_{\text{aug}}$ ($1, 5, 10, 20$) with $\pm 1\sigma$ band across $N=20$ seeds.
-- **Step 9: Programmatic Claims Audit Suite (`09_audit_paper_claims.py`):**
-  Executes an automated verification script testing 113 claims directly against `main.tex`, saving the complete verification matrix to `results/audit_report.txt`.
+- **Step 9: Programmatic Verification Suite (`09_audit_paper_claims.py`):**
+  Executes an automated verification script testing 113 claims, saving the complete verification matrix to `results/audit_report.txt`.
 
 ---
 
-## Automated Paper Claims Audit
+## Automated Verification Suite
 
-Running `./run.sh --step 9` programmatically verifies every numerical claim, table cell, confidence interval, and test in the paper:
+Running `./run.sh --step 9` programmatically audits every table cell, confidence interval, and test statistic across the entire benchmark suite:
 
 ```text
 ================================================================================
  STEP 9: PROGRAMMATIC VERIFICATION & CLAIMS AUDIT SUITE
- Paper: 'When Fidelity Lies: Identity Collapse in Generative Augmentation...'
+ Study: 'When Fidelity Lies: Identity Collapse in Generative Augmentation...'
 ================================================================================
 
 --- AUDITING TABLE II (Tier-wise SIPR, MMD^2, GCR, & Wilson CIs) ---
@@ -308,7 +302,7 @@ Running `./run.sh --step 9` programmatically verifies every numerical claim, tab
  [PASS] Genus Audit: Distance reduction percentage (%)    | Claimed: 4.55         | Observed: 4.5549
  [PASS] Genus Audit: Acoustic difference p-value          | Claimed: 0.006        | Observed: 0.0064
  [PASS] Genus Confusion: Real data error rate (%)         | Claimed: 8.1          | Observed: 8.1
- [PASS] Genus Confusion: Synthetic error rate (%)         | Claimed: 12.2         | Observed: 12.2
+ [PASS] Genus Confusion: Synthetic error rate (%)          | Claimed: 12.2         | Observed: 12.2
  [PASS] Genus Confusion: Standard z-statistic             | Claimed: 5.05         | Observed: 5.0435
  [PASS] Genus Confusion: Cluster-deflated z-stat          | Claimed: 2.89         | Observed: 2.8926
  [PASS] Genus Confusion: Cluster-deflated p-value         | Claimed: 0.004        | Observed: 0.0038
@@ -321,22 +315,8 @@ Running `./run.sh --step 9` programmatically verifies every numerical claim, tab
 
 ================================================================================
  FINAL AUDIT RESULT: 113 / 113 CLAIMS VERIFIED (100.0%)
- [SUCCESS] 100% OF PAPER CLAIMS REPRODUCED PERFECTLY!
+ [SUCCESS] 100% OF BENCHMARK CLAIMS REPRODUCED PERFECTLY!
 ================================================================================
-```
-
----
-
-## Citation
-
-```bibtex
-@article{krishna2026fidelity,
-  author    = {Krishna, Nived and Kala, S},
-  title     = {When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale},
-  journal   = {IEEE Signal Processing Letters (Under Publication)},
-  year      = {2026},
-  url       = {https://github.com/NivedKris/insectset459-generative}
-}
 ```
 
 ---

@@ -1,6 +1,6 @@
 """
 Step 6: Oracle Triage Analysis (Confidence-Based Filtering).
-Reproduces the Triage Effect findings from paper Section IV-C:
+Quantifies the Triage Effect findings:
 1. Overall Survival Rate: 36.9% of the 22,950-sample cache survives (63.1% discarded).
 2. Tier 4 Abandonment: Exactly 35 out of 115 tail species receive ZERO surviving synthetic samples.
 3. Severe Scarcity: 59 additional tail species receive fewer than 5 surviving samples.
@@ -59,7 +59,7 @@ def run_triage_analysis(mode: str = "quick"):
     print(f"  Two-Sided p-value                 : p = {p_value:.2f}")
     print(f"  Cohen's d Effect Size             : d = {cohens_d:.2f}")
     print(f"  Significance Conclusion           : NOT STATISTICALLY SIGNIFICANT (p = 0.61 > 0.05)")
-    print("  Paper Finding: The triage effect leaves the rarest species entirely unaugmented,")
+    print("  Key Finding: The triage effect leaves the rarest species entirely unaugmented,")
     print("  so filtered augmentation behaves almost identically to the unaugmented baseline.")
 
     # Save to JSON

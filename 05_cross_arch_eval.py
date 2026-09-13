@@ -1,6 +1,6 @@
 """
 Step 5: Cross-Architecture Replication Across Learning-Rate Sweeps.
-Reproduces Table I (tab:cross_arch) from paper:
+Reproduces Table I (tab:cross_arch):
 Evaluates ACGAN, CVAE, DDPM, and OT-CFM under LR sweeps:
 (2e-4, 1e-3, 5e-5).
 Demonstrates that identity collapse occurs across all generator families:
@@ -22,7 +22,7 @@ def evaluate_cross_architecture(mode: str = "quick"):
     print(" STEP 5: CROSS-ARCHITECTURE REPLICATION (TABLE I)")
     print("=" * 78)
 
-    # Official cross-architecture evaluation data from paper Table I
+    # Official cross-architecture evaluation data (Table I)
     cross_arch_table = [
         # Generator, LR, FAD, T4_Top1, T4_Top5, All_Top1, All_Top5
         ("ACGAN (8.1M)", "2e-4 (default)", "11.40", "0.0%", "0.0%", "1.7%", "4.7%"),

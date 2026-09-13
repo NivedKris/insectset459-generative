@@ -1,12 +1,11 @@
 """
 Step 9: Programmatic Verification & Claims Audit Suite.
-Verifies all numerical claims, table cells, statistical tests, and figure artifacts
-against IEEE SPL paper main.tex:
+Verifies all numerical claims, table cells, statistical tests, and figure artifacts:
 - Table I: Complete cross-architecture evaluation (all 12 rows, all 5 metric columns)
 - Table II: Tier-wise SIPR, MMD^2, GCR, sample counts, and Wilson 95% CIs
 - Table III: N=20 TOST equivalence & downstream Macro-F1 with paired t-test & sign test
 - Section IV stats: Spearman rho, triage effect, genus confusion gap, ResNet50d replication
-- Artifact inspection: Confirms all 4 figures match paper specifications
+- Artifact inspection: Confirms all 4 figures match specifications
 """
 import os
 import json
@@ -21,7 +20,7 @@ from src.config import (
 def run_claims_audit():
     print("=" * 80)
     print(" STEP 9: PROGRAMMATIC VERIFICATION & CLAIMS AUDIT SUITE")
-    print(" Paper: 'When Fidelity Lies: Identity Collapse in Generative Augmentation...'")
+    print(" Study: 'When Fidelity Lies: Identity Collapse in Generative Augmentation...'")
     print("=" * 80)
 
     audit_results = []
@@ -38,7 +37,7 @@ def run_claims_audit():
                 passed = False
         audit_results.append({
             "claim": name,
-            "claimed_in_paper": str(claimed),
+            "claimed_value": str(claimed),
             "observed_in_code": str(observed),
             "status": "PASS" if passed else "FAIL"
         })
@@ -251,7 +250,7 @@ def run_claims_audit():
     check("Genus Confusion: Cluster-deflated p-value", 0.004, p_def, tol=1e-3)
 
     # --------------------------------------------------------------------------
-    # 6. Check Rendered Paper Figures
+    # 6. Check Rendered Figures
     # --------------------------------------------------------------------------
     print("\n--- AUDITING RENDERED FIGURE ARTIFACTS ---")
     figures = [
@@ -273,7 +272,7 @@ def run_claims_audit():
     print("\n" + "=" * 80)
     print(f" FINAL AUDIT RESULT: {n_pass} / {total} CLAIMS VERIFIED ({n_pass/total*100:.1f}%)")
     if n_fail == 0:
-        print(" \033[92m[SUCCESS] 100% OF PAPER CLAIMS REPRODUCED PERFECTLY!\033[0m")
+        print(" \033[92m[SUCCESS] 100% OF BENCHMARK CLAIMS REPRODUCED PERFECTLY!\033[0m")
     else:
         print(f" \033[91m[WARNING] {n_fail} claims failed verification.\033[0m")
     print("=" * 80 + "\n")
@@ -281,10 +280,10 @@ def run_claims_audit():
     # Save report
     report_path = os.path.join(RESULTS_DIR, "audit_report.txt")
     with open(report_path, "w") as fp:
-        fp.write("IEEE SPL REPRODUCIBILITY AUDIT REPORT\n")
+        fp.write("BENCHMARK REPRODUCIBILITY AUDIT REPORT\n")
         fp.write(f"Total Claims Tested: {total} | Passed: {n_pass} | Failed: {n_fail}\n\n")
         for r in audit_results:
-            fp.write(f"[{r['status']}] {r['claim']}: claimed={r['claimed_in_paper']}, observed={r['observed_in_code']}\n")
+            fp.write(f"[{r['status']}] {r['claim']}: claimed={r['claimed_value']}, observed={r['observed_in_code']}\n")
     print(f"[Output] Full audit report saved to {report_path}\n")
 
 

@@ -52,7 +52,7 @@ class InsectClassifier(nn.Module):
 class ResNetClassifier(nn.Module):
     """
     Secondary architecture: ResNet50d for cross-architecture validation.
-    Used in paper Section III-B / IV to confirm monotonic Tier-4 degradation across seeds.
+    Confirms monotonic Tier-4 degradation across seeds.
     """
     def __init__(self, num_classes: int = 459, in_chans: int = 1, pretrained: bool = False):
         super().__init__()

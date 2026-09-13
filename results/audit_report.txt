@@ -1,4 +1,4 @@
-IEEE SPL REPRODUCIBILITY AUDIT REPORT
+BENCHMARK REPRODUCIBILITY AUDIT REPORT
 Total Claims Tested: 113 | Passed: 113 | Failed: 0
 
 [PASS] Table II: Tier 1 Synth Chunks Evaluated: claimed=3650, observed=3650

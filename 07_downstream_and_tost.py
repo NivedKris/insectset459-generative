@@ -1,6 +1,6 @@
 """
 Step 7: Downstream Classifier Augmentation Evaluation & Pre-Registered TOST Equivalence.
-Reproduces Table III (tab:tier4_f1) from paper:
+Reproduces Table III (tab:tier4_f1):
 - Loads the N=20 independent seed runs from checkpoints/phase3_chunks/
 - Computes Tier-4 Macro-F1 (mean +- std):
   1. Raw (no augmentation): 0.5047 +- 0.0105

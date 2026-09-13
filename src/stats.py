@@ -100,7 +100,7 @@ def wilson_ci(k: int, n: int, confidence: float = 0.95) -> Tuple[float, float, f
 def deflated_z_test(p1: float, n1: int, p2: float, n2: int, deff: float = 6.0) -> Tuple[float, float]:
     """
     Computes difference of proportions z-test deflated by survey design effect (DEFF).
-    Used in paper to account for chunk-level intra-recording correlation (ICC rho=0.698).
+    Accounts for chunk-level intra-recording correlation (ICC rho=0.698).
     """
     # Deflate effective sample sizes
     n1_eff = max(1, n1 / deff)

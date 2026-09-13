@@ -1,6 +1,6 @@
 """
-Step 8: High-Resolution Paper Figure Rendering.
-Generates the four primary figures from the IEEE SPL paper into results/figures/:
+Step 8: High-Resolution Figure Rendering.
+Generates the four primary benchmark figures into results/figures/:
 1. Figure 1: fig1_longtail.png
    Long-tail performance collapse: F1 vs. training chunk count for all 459 species,
    colored by quartile tier with log-linear OLS trendline (R^2 = 0.05, rho = 0.33).
@@ -36,8 +36,8 @@ from src.config import (
 
 
 def render_fig1_longtail(out_path: str):
-    """Figure 1: Per-species F1 vs n_train (log-scale) scatter plot.
-    Exact reproduction of the IEEE SPL paper Figure 1.
+    """
+    Exact reproduction of Figure 1.
     """
     print("  [Rendering] Figure 1: fig1_longtail.png...")
     species_json = os.path.join(DATA_DIR, "fig1_species_data.json")
@@ -161,8 +161,8 @@ def render_fig1_longtail(out_path: str):
 
 
 def render_fig4_degradation(out_path: str):
-    """Figure 4: Downstream Degradation Curve vs K_aug across N=20 independent seeds.
-    Exact reproduction of the IEEE SPL paper Figure 4.
+    """
+    Exact reproduction of Figure 4.
     """
     print("  [Rendering] Figure 4: fig_degradation_curve_n20.png...")
     plt.rcdefaults()
@@ -213,7 +213,7 @@ def render_fig4_degradation(out_path: str):
 
 def render_all_figures():
     print("=" * 78)
-    print(" STEP 8: RENDERING ALL IEEE SPL PAPER FIGURES")
+    print(" STEP 8: RENDERING ALL FIGURES")
     print("=" * 78)
     os.makedirs(FIGURES_DIR, exist_ok=True)
 
@@ -235,10 +235,10 @@ def render_all_figures():
         src_fig = os.path.join(parent_figs, fig_name)
         if os.path.exists(src_fig):
             shutil.copy(src_fig, dst_path)
-            print(f"  [Verified] Paper asset: {fig_name}")
+            print(f"  [Verified] Benchmark asset: {fig_name}")
 
     print("\n" + "-" * 78)
-    print(f" All 4 Paper Figures Rendered / Verified in: {FIGURES_DIR}")
+    print(f" All 4 Figures Rendered / Verified in: {FIGURES_DIR}")
     for f in [fig1_path, fig2_path, fig3_path, fig4_path]:
         sz = os.path.getsize(f) / 1024 if os.path.exists(f) else 0
         print(f"  - {os.path.basename(f):<32} : {sz:.1f} KB")

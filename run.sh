@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# IEEE Signal Processing Letters (SPL) Reproducibility Kit
-# Paper: "When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale"
-# Authors: Nived Krishna and Kala S (Senior Member, IEEE)
+# InsectSet459 Generative Benchmark Suite
+# Study: "When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale"
+# Authors: Nived Krishna and Kala S
 # ==============================================================================
 
 set -euo pipefail
@@ -15,7 +15,7 @@ STEP="all"
 
 print_help() {
     echo "=============================================================================="
-    echo " IEEE SPL Reproducibility Kit - Master Runner"
+    echo " Benchmark & Verification Suite - Master Runner"
     echo "=============================================================================="
     echo "Usage: ./run.sh [OPTIONS]"
     echo ""
@@ -31,7 +31,7 @@ print_help() {
     echo "                     5: Cross-Architecture LR Sweep Replication (Table I)"
     echo "                     6: Oracle Confidence Triage Analysis"
     echo "                     7: Downstream Augmentation & N=20 TOST Equivalence (Table III)"
-    echo "                     8: Render All High-Resolution Paper Figures"
+    echo "                     8: Render All High-Resolution Figures"
     echo "                     9: Automated Claims & Numerical Audit Suite"
     echo "  --help, -h       Show this help message and exit"
     echo "=============================================================================="
@@ -64,8 +64,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 echo "=============================================================================="
-echo " IEEE Signal Processing Letters (SPL) Reproducibility Pipeline"
-echo " Paper: When Fidelity Lies: Identity Collapse in Generative Augmentation..."
+echo " Benchmark & Verification Pipeline"
+echo " Study: When Fidelity Lies: Identity Collapse in Generative Augmentation..."
 echo " Execution Mode: [${MODE^^}] | Target Step: [${STEP}]"
 echo "=============================================================================="
 
@@ -168,7 +168,7 @@ run_step_7() {
 
 run_step_8() {
     echo ""
-    echo ">>> Running Step 8: Rendering High-Resolution Paper Figures..."
+    echo ">>> Running Step 8: Rendering High-Resolution Figures..."
     $PYTHON_CMD 08_render_figures.py
 }
 
@@ -227,5 +227,5 @@ echo "  [Claims Verification Report]:"
 cat results/audit_report.txt | head -n 8
 echo "------------------------------------------------------------------------------"
 echo "=============================================================================="
-echo " [SUCCESS] IEEE SPL Reproducibility Kit Execution Complete!"
+echo " [SUCCESS] Benchmark Pipeline Execution Complete!"
 echo "=============================================================================="

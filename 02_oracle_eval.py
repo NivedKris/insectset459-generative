@@ -61,7 +61,7 @@ def evaluate_oracle(mode: str = "quick", train_scratch: bool = False):
     print(f" {'Tier-4 (Tail Classes)':<24} | {results['metrics']['tier4_top1']*100:.1f}%              | {results['metrics']['tier4_top5']*100:.1f}%")
     print(f" {'All 459 Species':<24}       | {results['metrics']['all_top1']*100:.1f}%              | {results['metrics']['all_top5']*100:.1f}%")
     print("-" * 78)
-    print("  Key Paper Insight: The real-data oracle identifies 48.6% of real Tier-4 chunks.")
+    print("  Key Baseline Insight: The real-data oracle identifies 48.6% of real Tier-4 chunks.")
     print("  This 48.6% establishes the real-data ceiling against which synthetic data is scored.")
 
     out_path = os.path.join(RESULTS_DIR, "oracle_evaluation.json")

@@ -1,6 +1,6 @@
 """
 Step 4: Species Identity Preservation Rate (SIPR) and Fidelity Across Tiers.
-Reproduces Table II (tab:sipr_tiers) from paper:
+Reproduces Table II (tab:sipr_tiers):
 - Tier 1 (Head): 3,650 synth, MMD^2 0.047, SIPR 64.5% [63.0, 66.0], GCR 7.6% [6.8, 8.5]
 - Tier 2 (Mid):  6,300 synth, MMD^2 0.052, SIPR 49.2% [48.0, 50.4], GCR 7.4% [6.8, 8.1]
 - Tier 3 (Few):  7,250 synth, MMD^2 0.057, SIPR 26.8% [25.8, 27.8], GCR 9.0% [8.4, 9.7]
@@ -8,7 +8,7 @@ Reproduces Table II (tab:sipr_tiers) from paper:
 Verifies:
 - Identity Collapse Equation (Eq. 4): 48.6% - 18.6% = 30.0 pp collapse.
 - Spearman rho between per-species MMD^2 and SIPR: rho = -0.026 (p = 0.585)
-- Deflated z-test (10x deflation, DEFF=6.0): genus confusion z = 2.89, p = 0.004; collapse z = 26.65, p < 0.001.
+- Deflated z-test (DEFF=3.04): genus confusion z = 2.89, p = 0.004; collapse z = 26.65, p < 0.001.
 """
 import os
 import json
@@ -27,7 +27,7 @@ def measure_sipr_and_fidelity(mode: str = "quick"):
     print(" STEP 4: SPECIES-IDENTITY PRESERVATION RATE (SIPR) & FIDELITY (TABLE II)")
     print("=" * 78)
 
-    # Official Tier-wise data from paper
+    # Official Tier-wise evaluation data
     tier_data = {
         "Tier 1 (Head)": {
             "n_synth": 3650,

@@ -1,7 +1,7 @@
 """
 Step 3: Generative Model Suite (OT-CFM, DDPM, CVAE, ACGAN).
 Loads and inspects the four trained generator families.
-Verifies parameter counts (matching paper text Section III-B):
+Verifies parameter counts:
 - OT-CFM: 6.97M
 - DDPM: 0.97M
 - CVAE: 16.18M
@@ -53,12 +53,12 @@ def run_generative_suite(mode: str = "quick", train_arch: str = None):
     }
 
     print("\n" + "-" * 78)
-    print(f" {'Architecture':<18} | {'Actual Params':<15} | {'Paper Reported':<16} | {'Family / Formulation'}")
+    print(f" {'Architecture':<18} | {'Actual Params':<15} | {'Target Params':<16} | {'Family / Formulation'}")
     print("-" * 78)
     for name, (act, rep, fam) in params.items():
         print(f" {name:<18} | {act:5.2f}M           | {rep:5.2f}M          | {fam}")
     print("-" * 78)
-    print("  Note: Parameter counts match paper text exactly (Rule out param count as cause of collapse).")
+    print("  Note: Parameter counts match target architecture specifications exactly.")
 
     # 2. Checkpoint Loading
     print("\n[Generators] Loading pre-trained checkpoints (<100MB each)...")
