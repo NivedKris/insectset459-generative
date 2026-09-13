@@ -1,217 +1,216 @@
-# IEEE Signal Processing Letters (SPL) Reproducibility Kit
+# When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale
 
-Official reproducibility repository for the manuscript submitted to the *IEEE Signal Processing Letters*:
+Official research repository and reproducibility kit for the paper published in the *IEEE Signal Processing Letters*:
 
 > **When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale**  
 > **Authors:** Nived Krishna$^1$ and Kala S$^{2,*}$, *Senior Member, IEEE*  
 > $^1$*Department of Computer Science & Engineering, Indian Institute of Technology Kharagpur, India*  
 > $^2$*Department of Electronics & Communication Engineering, Indian Institute of Information Technology Kottayam, India*  
+> **Paper & Code:** [https://github.com/NivedKris/insectset459-generative](https://github.com/NivedKris/insectset459-generative)
 
 ---
 
-## 🚀 Quick Start (< 3 Minutes)
+## Abstract
 
-To verify all claims, tables (Tables I, II, III), figures (Figures 1, 2, 3, 4), and statistical audits:
+Generative augmentation is widely employed to address extreme class imbalance in long-tail recognition, yet its behavior at extreme taxonomical scale (hundreds of fine-grained species) has remained largely unquantified. In this paper, we evaluate conditional generative models (Optimal Transport Conditional Flow Matching, Diffusion Probabilistic Models, Conditional Variational Autoencoders, and Auxiliary Classifier GANs) on **InsectSet459**, an extreme long-tail benchmark comprising 459 insect species. 
+
+While generators achieve low batch-level distributional distance (Fréchet Audio Distance and Maximum Mean Discrepancy, $\text{MMD}^2 = 0.058 \pm 0.019$), per-sample class-identity verification reveals a severe pathology: **Species-Identity Preservation Rate (SIPR)** collapses from **64.5%** on head species to **18.6%** on tail species (compared to a real-data oracle baseline of **48.6%**). We term this phenomenon **identity collapse** and demonstrate that it is architecture-general across all four generative families. Post-hoc confidence filtering discards 63.1% of generated data, abandoning 35 of 115 tail species entirely. In a pre-registered $N=20$ independent-seed equivalence audit, Two One-Sided Tests (TOST, $\pm 0.020$ margin) prove inconclusive, while paired significance testing ($p = 0.0003, d = 0.98$) demonstrates that even filtered generative augmentation is statistically outperformed by zero-cost spectral masking (SpecAugment).
+
+---
+
+## Key Experimental Findings
+
+1. **Distributional Fidelity Does Not Predict Sample Utility:**
+   Batch-level metrics ($\text{MMD}^2$, FAD) fail to detect sample-level class corruption. Across 459 species, Spearman rank correlation between distributional fidelity and identity preservation is null ($\rho = -0.026, p = 0.585$).
+2. **Identity Collapse is Architecture-General:**
+   Under extensive hyperparameter and learning-rate sweeps, all baseline generative families collapse near 0% top-1 accuracy on tail classes (ACGAN: 0.0%, DDPM: 0.0%, CVAE: 6.7%), while OT-CFM reaches 18.6% (compared to the 48.6% real-data oracle bar).
+3. **Genus-Level Acoustic Prior Limitation:**
+   Within-genus acoustic cosine distance in PANNs embedding space is only 4.55% smaller than cross-genus distance ($0.174 \text{ vs. } 0.182, p = 0.006, n = 74$ multi-species genera). Synthetic genus confusion (12.2%) exceeds real errors (8.1%, cluster-deflated $z = 2.89, p = 0.004$), but this 4.1 pp gap cannot account for the 30.0 pp collapse.
+4. **Oracle Confidence Triage Creates Tail Abandonment:**
+   Filtering synthetic samples by oracle confidence retains only 36.9% of samples. In the critical tail tier, 35/115 species receive zero usable synthetic samples, and 59 more receive fewer than 5, reducing effective tail augmentation $K_{\text{gen}}$ from 50 to 2.83.
+5. **Rigorous Equivalence and Significance Protocol ($N=20$ Seeds):**
+   A pre-registered TOST audit ($\pm 0.020$ margin) yields a 90% CI of $[-0.0202, -0.0088]$ ($p = 0.055$, inconclusive). A paired $t$-test ($p = 0.0003, d = 0.98$) and binomial sign test (16/20 wins, $p = 0.012$) establish that standard zero-cost SpecAugment significantly outperforms filtered generative augmentation.
+
+---
+
+## Quick Start & Reproduction
+
+The kit includes a master runner script (`run.sh`) that provisions the environment and executes the pipeline in under 30 seconds:
 
 ```bash
 # Clone the repository
 git clone https://github.com/NivedKris/insectset459-generative.git
-cd "IEEE SPL"
+cd insectset459-generative
 
-# Execute the universal master script in quick reproduction mode
-bash run.sh --quick
+# Execute the master reproduction script in fast verification mode
+./run.sh
 ```
 
-All figures are rendered into `results/figures/` and all numerical tables into `results/tables/`.
+### Operational Modes
+
+- **Fast Verification Mode (`./run.sh` or `./run.sh --quick`) [Default]:**
+  Evaluates trained checkpoints across all models, generates exact numerical results for Tables I, II, and III, computes exact statistical tests (TOST, paired $t$-test, sign test, Wilson CIs, deflated $z$-tests), renders all publication-quality figures, and executes an automated 113-point verification audit against `main.tex`. Runtime: $< 30$ seconds.
+- **Full Retraining Mode (`./run.sh --full` or `./run.sh --train`):**
+  Executes full training from scratch on InsectSet459: trains the EfficientNetV2-S oracle classifier, trains all four generative models (OT-CFM, DDPM, CVAE, ACGAN), performs ODE conditional sampling, and runs the downstream $N=20$ paired classification seed sweep. Hardware requirement: NVIDIA GPU with $\ge 24$ GB VRAM (e.g., A40, RTX 3090/4090, A100).
+- **Single Step Execution (`./run.sh --step <N>`):**
+  Executes any individual stage of the pipeline ($N \in \{1, \dots, 9\}$).
 
 ---
 
-## 📋 Execution Modes
+## Pre-Trained Checkpoints & Model Architecture
 
-The reproducibility kit provides two operational modes via `run.sh`:
+The repository provides standalone inference weights for all models evaluated in the paper:
 
-1. **Fast Mode (`./run.sh --quick` or `./run.sh`) [Default]**:
-   - Uses pre-trained inference checkpoints (all strictly `< 82 MB`, conforming to GitHub's 100 MB limit) and evaluation logs.
-   - Computes exact Wilson score confidence intervals, Spearman rank correlations, deflated $z$-tests, Two One-Sided Tests (TOST) equivalence, and paired $t$-tests.
-   - Renders high-resolution publication figures and runs an automated 44-point verification audit against `main.tex`.
-   - **Runtime**: $< 3$ minutes on any modern workstation with GPU or CPU.
-
-2. **Full Training Mode (`./run.sh --full` or `--train`)**:
-   - Trains the EfficientNetV2-S oracle classifier from scratch on InsectSet459.
-   - Trains the 4 generative families (OT-CFM, DDPM, CVAE, ACGAN).
-   - Generates conditional spectrograms with Euler ODE integration and CFG ($w=2.0$).
-   - Executes the downstream $N=20$ paired seed classification sweep.
-   - **Hardware Recommended**: NVIDIA GPU with $\ge 24$ GB VRAM (e.g., A40, RTX 3090, RTX 4090, A100).
+| Model Architecture | File Path | Parameter Count | Resolution / Input | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| **EfficientNetV2-S** (Oracle) | `checkpoints/oracle/best_oracle.pt` | 20.3M | $1 \times 128 \times 235$ | Real-data ceiling classifier trained on real InsectSet459 recordings |
+| **OT-CFM** (Ours) | `checkpoints/ot_cfm/best_ot_cfm.pt` | 6.97M | $1 \times 128 \times 235$ | Optimal Transport Conditional Flow Matcher with 640-d taxonomic FiLM |
+| **CVAE** | `checkpoints/cvae/best_cvae.pt` | 16.18M | $1 \times 128 \times 235$ | Convolutional Variational Autoencoder baseline |
+| **ACGAN** | `checkpoints/acgan/best_acgan.pt` | 8.12M | $1 \times 128 \times 235$ | Auxiliary Classifier Generative Adversarial Network baseline |
+| **DDPM** | `checkpoints/ddpm/best_ddpm.pt` | 0.97M | $1 \times 128 \times 235$ | Conditional Denoising Diffusion Probabilistic Model baseline |
+| **Downstream Seed Runs** | `checkpoints/phase3_chunks/*.json` | 140 runs | Metrics / F1 | Full $N=20$ seed evaluation runs across all augmentation conditions |
 
 ---
 
-## 📦 GitHub 100 MB Limit Compliance
+## Pipeline Architecture & Module Description
 
-GitHub blocks pushes containing files larger than 100 MB (`GH001`). All model weights in this kit have been audited and stripped of non-inference training optimizer states:
-
-| Model Architecture | Checkpoint File | Parameter Count | Disk Size | GitHub Safe? |
-| :--- | :--- | :--- | :--- | :--- |
-| **Oracle Classifier** (EfficientNetV2-S) | `checkpoints/oracle/best_oracle.pt` | 20.3M | **80.07 MB** | ✅ `< 100 MB` |
-| **OT-CFM Generator** (Ours, Flow Matching) | `checkpoints/ot_cfm/best_ot_cfm.pt` | 6.97M | **26.65 MB** | ✅ `< 100 MB` |
-| **CVAE Generator** (Variational Autoencoder) | `checkpoints/cvae/best_cvae.pt` | 16.18M | **62.00 MB** | ✅ `< 100 MB` |
-| **ACGAN Generator** (Adversarial GAN) | `checkpoints/acgan/best_acgan.pt` | 8.12M | **31.00 MB** | ✅ `< 100 MB` |
-| **DDPM Generator** (Diffusion Model) | `checkpoints/ddpm/best_ddpm.pt` | 0.97M | **3.80 MB** | ✅ `< 100 MB` |
-| **Downstream Evaluation Chunks** | `checkpoints/phase3_chunks/*.json` | 140 runs | **< 2.0 MB** | ✅ `< 100 MB` |
-
-*Note*: Large raw audio archives (51 GB) and multi-GB floating-point caches are excluded via `.gitignore`. If local datasets are present, the kit automatically links them; otherwise, it downloads official annotations and audio from Zenodo.
-
----
-
-## 🔬 Step-by-Step Module Architecture
-
-Each phase is accessible as a modular, standalone Python script or through `run.sh --step <1-9>`:
-
-### Step 1: Dataset Setup & Split Insight Audit (`01_dataset_setup.py`)
-- Automatically links local InsectSet459 audio or downloads from Zenodo Record `14056458`.
-- Verifies zero recording-ID overlap across Train (15,788), Validation (5,290), and Test (5,219) splits.
-- Computes quartile tiers by training chunk counts:
-  - **Tier 1 (Head)**: $> 600$ chunks ($n=114$ species)
-  - **Tier 2 (Mid)**: $251 - 600$ chunks ($n=115$ species)
-  - **Tier 3 (Few)**: $119 - 250$ chunks ($n=115$ species)
-  - **Tier 4 (Tail)**: $\le 118$ chunks ($n=115$ species, minimum 4 test chunks)
-- Validates 48 kHz wideband log-mel spectrogram extraction: $(1 \times 128 \times 235)$.
-
-### Step 2: Oracle Classifier & Real-Data Ceiling (`02_oracle_eval.py`)
-- Loads the real-data-trained EfficientNetV2-S oracle.
-- Measures oracle performance on real test chunks:
-  - **Tier-4 Real Accuracy**: **48.6% Top-1** (76.5% Top-5)
-  - **All-Class Real Accuracy**: **68.2% Top-1** (87.4% Top-5)
-  - Sets the real-data ceiling $\overline{\text{SIPR}}^{\text{real}}_T$.
-
-### Step 3: Generative Architecture Suite (`03_generative_models.py`)
-- Loads and verifies parameter counts across all 4 generator families.
-- Generates conditional test spectrograms using Euler ODE flow matching ($w=2.0$), reverse diffusion, and latent decoding.
-
-### Step 4: SIPR, MMD², Genus Confusion & Identity Collapse (`04_measure_sipr.py`)
-- Reproduces **Table II** of the manuscript:
-  - **Tier 1**: $\text{MMD}^2 = 0.047$, $\text{SIPR} = 64.5\%$ [63.0, 66.0], $\text{GCR} = 7.6\%$ [6.8, 8.5]
-  - **Tier 2**: $\text{MMD}^2 = 0.052$, $\text{SIPR} = 49.2\%$ [48.0, 50.4], $\text{GCR} = 7.4\%$ [6.8, 8.1]
-  - **Tier 3**: $\text{MMD}^2 = 0.057$, $\text{SIPR} = 26.8\%$ [25.8, 27.8], $\text{GCR} = 9.0\%$ [8.4, 9.7]
-  - **Tier 4**: $\text{MMD}^2 = 0.059$, $\text{SIPR} = 18.6\%$ [17.6, 19.6], $\text{GCR} = 12.2\%$ [11.4, 13.1]
-- **Identity Collapse (Eq. 4)**: $48.6\% - 18.6\% = 30.0\text{ pp} \ge 30.0\text{ pp}$ margin (CONFIRMED).
-- **Fidelity-Identity Divergence**: Spearman $\rho = -0.026$ ($p = 0.585$), proving distributional fidelity metrics (MMD$^2$/FAD) cannot certify per-sample identity.
-- **Cluster-Deflated $z$-test** ($\text{DEFF} = 6.0$, $\text{ICC} = 0.698$): Genus confusion gap ($z = 2.89, p = 0.004$) is statistically real but far too small (4.1 pp) to explain the 30.0 pp collapse.
-
-### Step 5: Cross-Architecture Replication (`05_cross_arch_eval.py`)
-- Reproduces **Table I** of the manuscript across learning-rate sweeps ($2\times 10^{-4}$, $1\times 10^{-3}$, $5\times 10^{-5}$):
-  - **ACGAN (8.1M)**: Collapses to $0.0\%$ Tier-4 Top-1 across all LRs.
-  - **DDPM (1.0M)**: Collapses to $0.0\%$ Tier-4 Top-1 across all LRs.
-  - **CVAE (16.2M)**: Peaks at $6.7\%$ Tier-4 Top-1 (Best LR $3\times 10^{-4}$).
-  - **OT-CFM (Ours)**: Reaches **17.5%** (single-LR) / **18.6%** (two-stage), outperforming all baselines ($p < 0.001$).
-  - Proves identity collapse is architecture-general.
-
-### Step 6: Oracle Triage Analysis (`06_triage_analysis.py`)
-- Implements confidence-based oracle filtering ($\text{argmax}_k f_\phi(x)_k = c$).
-- Quantifies the severe triage effect on tail species:
-  - $63.1\%$ of the 22,950-sample cache discarded ($36.9\%$ retained).
-  - **35 out of 115 tail species** left with ZERO surviving synthetic samples.
-  - **59 additional tail species** left with $<5$ samples.
-  - Effective mean $K_{\text{gen}}$ in Tier 4 collapses from 50 to 2.83.
-  - Paired $t$-test (Filtered vs. Raw): $t = -0.51, p = 0.61, d = -0.11$ (statistically indistinguishable from no augmentation).
-
-### Step 7: Downstream Augmentation & $N=20$ TOST Equivalence (`07_downstream_and_tost.py`)
-- Evaluates 20 independent paired seeds and reproduces **Table III**:
-  - **Raw**: $0.5047 \pm 0.0105$
-  - **Unfiltered Generative ($K=5$)**: $0.4961 \pm 0.0143$
-  - **Filtered Generative ($K=5$)**: $0.5029 \pm 0.0097$
-  - **SpecAugment**: $0.5174 \pm 0.0115$
-- **Pre-Registered TOST Equivalence ($\pm 0.020$ margin)**:
-  - 90% CI: $[-0.0202, -0.0088]$, $p = 0.055$ (**Inconclusive**).
-- **Paired $t$-test**: $t = -4.394, p = 0.0003, d = 0.98$ (SpecAugment significantly outperforms filtered generative augmentation).
-- **Binomial Sign Test**: 16/20 wins for SpecAugment ($p = 0.012$).
-- **Secondary Architecture Audit**: ResNet50d ($N=3$ seeds) replicates monotonic degradation (Raw 0.521, Gen $K=5$: 0.512, Gen $K=50$: 0.481).
-
-### Step 8: Rendering High-Resolution Paper Figures (`08_render_figures.py`)
-- Generates publication-quality images:
-  - `fig1_longtail.png`: Long-tail collapse vs training chunks with quartile colors and OLS trendline ($R^2=0.05, \rho=0.33$).
-  - `fig2_spectrogram_grid.png`: Real vs unfiltered synthetic spectrograms for Tier-4 species.
-  - `fig_baseline_spectrograms.png`: Cross-architecture grid ($4 \times 4$) comparing ACGAN, CVAE, OT-CFM, and DDPM.
-  - `fig_degradation_curve_n20.png`: Dual-panel figure: Left = MMD$^2$ distribution ($0.058 \pm 0.019$); Right = Tier-4 Macro-F1 degradation curve vs $K_{\text{aug}}$ ($1, 5, 10, 20$) with $\pm 1\sigma$ band across 20 seeds.
-
-### Step 9: Claims & Numerical Audit Suite (`09_audit_paper_claims.py`)
-- Automatically validates **44 out of 44 claims and numerical values** from `main.tex`.
-- Generates `results/audit_report.txt` with a 100% pass rate.
-
----
-
-## 📊 Summary of Main Results
-
-```
-================================================================================
-FINAL VERIFICATION AUDIT (44/44 CLAIMS VERIFIED - 100% AGREEMENT WITH MAIN.TEX)
-================================================================================
-[PASS] Table II: Tier 1 MMD^2               : 0.047
-[PASS] Table II: Tier 1 SIPR (%)            : 64.5% [63.0, 66.0]
-[PASS] Table II: Tier 4 MMD^2               : 0.059
-[PASS] Table II: Tier 4 SIPR (%)            : 18.6% [17.6, 19.6]
-[PASS] Table II: Tier 4 GCR (%)             : 12.2% [11.4, 13.1]
-[PASS] Identity Collapse Equation 4 (Gap)   : 30.0 pp (Exceeds >= 30.0 pp)
-[PASS] Fidelity-Identity Spearman rho       : -0.026 (p = 0.585, no correlation)
-[PASS] Table I: CVAE Best Tier-4 Top-1      : 6.7% (FAD 8.95)
-[PASS] Table I: OT-CFM Single-LR T4 Top-1   : 17.5% (FAD 2.18)
-[PASS] Table I: Real Data Oracle T4 Top-1   : 48.6% (Top-5: 76.5%)
-[PASS] Triage: Tail Species Abandoned (0)   : 35 / 115 species
-[PASS] Triage: Tail Species Starved (< 5)   : 59 / 115 species
-[PASS] Triage: Effective Mean K_gen in Tail : 2.83 samples
-[PASS] Table III: Raw Tier-4 Macro-F1       : 0.5047 ± 0.0105
-[PASS] Table III: Filtered Gen K=5 Macro-F1 : 0.5029 ± 0.0097
-[PASS] Table III: SpecAugment Macro-F1      : 0.5174 ± 0.0115
-[PASS] TOST 90% Confidence Interval         : [-0.0202, -0.0088] (p = 0.055, Inconclusive)
-[PASS] Paired t-test (SpecAug vs Filtered)  : p = 0.0003, Cohen's d = 0.98
-[PASS] Binomial Sign Test                   : 16/20 wins for SpecAugment (p = 0.012)
-[PASS] Secondary Classifier (ResNet50d)     : Raw 0.521 -> K=5 0.512 -> K=50 0.481
-================================================================================
-```
-
----
-
-## 📂 Repository Directory Layout
+The codebase is organized into nine sequential, standalone modules:
 
 ```
 IEEE SPL/
-├── run.sh                          # Universal master entrypoint
-├── README.md                       # Comprehensive documentation
-├── requirements.txt                # Pinned Python dependencies
-├── environment.json                # Hardware & environment specification
-├── .gitignore                      # GitHub file size safety rules (<100MB)
-├── 01_dataset_setup.py             # Step 1: Data acquisition & tier audit
-├── 02_oracle_eval.py               # Step 2: Base oracle real ceiling
-├── 03_generative_models.py         # Step 3: Generative models suite & sampling
-├── 04_measure_sipr.py              # Step 4: SIPR, MMD², GCR & collapse (Table II)
-├── 05_cross_arch_eval.py           # Step 5: Cross-architecture replication (Table I)
-├── 06_triage_analysis.py           # Step 6: Triage & 35-abandoned tail audit
-├── 07_downstream_and_tost.py       # Step 7: Downstream F1 & N=20 TOST (Table III)
-├── 08_render_figures.py            # Step 8: High-resolution figure renderer
-├── 09_audit_paper_claims.py        # Step 9: Programmatic verification suite
-├── src/                            # Reusable library package
-│   ├── config.py                   # Constants, tier bounds, paths
-│   ├── dataset.py                  # Chunk-level dataloaders & transforms
-│   ├── models/                     # Classifier & Generator definitions
-│   ├── metrics.py                  # SIPR, GCR, MMD², Macro-F1
-│   └── stats.py                    # TOST, paired t-test, sign test, Wilson CI
-├── checkpoints/                    # ALL FILES STRICTLY < 82 MB
-│   ├── oracle/best_oracle.pt       # EfficientNetV2-S weights (80.07 MB)
-│   ├── ot_cfm/best_ot_cfm.pt       # OT-CFM EMA weights (26.65 MB)
-│   ├── cvae/best_cvae.pt           # CVAE baseline weights (62.00 MB)
-│   ├── acgan/best_acgan.pt         # ACGAN baseline weights (31.00 MB)
-│   ├── ddpm/best_ddpm.pt           # DDPM baseline weights (3.80 MB)
-│   └── phase3_chunks/              # All 140 N=20 run chunks (< 2.0 MB)
-└── results/                        # Generated reproducibility outputs
-    ├── tables/                     # Tables I, II, III in JSON and formatted text
-    ├── figures/                    # High-res Figures 1, 2, 3, 4
-    └── audit_report.txt            # Complete claims verification matrix
+├── run.sh                          # Universal master runner
+├── requirements.txt                # Pinned dependencies
+├── environment.json                # Execution environment metadata
+├── 01_dataset_setup.py             # Step 1: Dataset acquisition, split audit, & tier partition
+├── 02_oracle_eval.py               # Step 2: Real-data oracle ceiling evaluation
+├── 03_generative_models.py         # Step 3: Generative model loading & conditional sampling
+├── 04_measure_sipr.py              # Step 4: SIPR, MMD², GCR & identity collapse (Table II)
+├── 05_cross_arch_eval.py           # Step 5: Cross-architecture LR sweep replication (Table I)
+├── 06_triage_analysis.py           # Step 6: Oracle confidence triage & tail starvation audit
+├── 07_downstream_and_tost.py       # Step 7: N=20 downstream Macro-F1 & TOST equivalence (Table III)
+├── 08_render_figures.py            # Step 8: Publication-quality figure generation (Figs 1–4)
+├── 09_audit_paper_claims.py        # Step 9: Programmatic verification suite (113 claims)
+├── src/                            # Research library
+│   ├── config.py                   # Global constants, taxonomy, and paths
+│   ├── dataset.py                  # Dataloaders, wideband spectrogram transforms
+│   ├── models/                     # PyTorch model definitions (Classifier & Generators)
+│   ├── metrics.py                  # Metric implementations (SIPR, GCR, MMD², F1)
+│   └── stats.py                    # TOST, paired t-test, sign test, Wilson CIs, deflated z-test
+├── checkpoints/                    # Model weights and statistical artifacts
+├── data/                           # Split annotations, header metadata, species mapping
+└── results/                        # Generated output tables, figures, and audit report
+```
+
+### Detailed Pipeline Steps
+
+- **Step 1: Dataset Setup & Split Audit (`01_dataset_setup.py`):**
+  Verifies the official 60/20/20 recording-level split on InsectSet459 (zero recording overlap) and defines chunk-quartile tiers: Tier 1 ($>600$ chunks, 114 species), Tier 2 ($251–600$, 115 species), Tier 3 ($119–250$, 115 species), Tier 4 ($\le 118$, 115 species).
+- **Step 2: Oracle Classifier Ceiling (`02_oracle_eval.py`):**
+  Evaluates the frozen real-data-trained EfficientNetV2-S oracle classifier: establishing the 48.6% Top-1 Tier-4 ceiling and 68.2% all-class ceiling.
+- **Step 3: Generative Architecture Suite (`03_generative_models.py`):**
+  Verifies model parameters, executes Euler ODE integration for OT-CFM ($w=2.0$ CFG), reverse diffusion sampling for DDPM, and latent decoding for CVAE and ACGAN.
+- **Step 4: SIPR, MMD², GCR & Identity Collapse (`04_measure_sipr.py`):**
+  Computes Table II metrics across all quartile tiers, calculates 95% Wilson score confidence intervals, verifies the 30.0 pp collapse threshold (Eq. 4), and executes the cluster-deflated $z$-test for genus confusion ($z=2.89, p=0.004$).
+- **Step 5: Cross-Architecture Replication (`05_cross_arch_eval.py`):**
+  Reproduces Table I across 12 generator configurations and learning-rate sweeps ($2\times 10^{-4}, 1\times 10^{-3}, 5\times 10^{-5}$), confirming identity collapse across GAN, VAE, DDPM, and Flow Matching families.
+- **Step 6: Confidence Triage Analysis (`06_triage_analysis.py`):**
+  Applies oracle top-1 confidence filtering, quantifying that 63.1% of synthetic samples are discarded, leaving 35/115 tail species with zero samples and 59 with $<5$, collapsing effective $K_{\text{gen}}$ from 50 to 2.83.
+- **Step 7: Downstream Augmentation & TOST Equivalence (`07_downstream_and_tost.py`):**
+  Aggregates $N=20$ independent paired seeds for Table III: Raw ($0.5047 \pm 0.0105$), Unfiltered Gen ($0.4961 \pm 0.0143$), Filtered Gen ($0.5029 \pm 0.0097$), and SpecAugment ($0.5174 \pm 0.0115$). Computes TOST 90% CI ($[-0.0202, -0.0088]$), paired $t$-test ($p=0.0003, d=0.98$), and sign test (16/20 wins, $p=0.012$). Replicates monotonic degradation on ResNet50d ($0.521 \to 0.512 \to 0.481$).
+- **Step 8: High-Resolution Figure Rendering (`08_render_figures.py`):**
+  Renders publication figures matching the paper bit-for-bit:
+  - `fig1_longtail.png`: F1 vs. training chunk count for 459 species with quartile tiers and OLS trendline ($R^2=0.05, \rho=0.33$).
+  - `fig2_spectrogram_grid.png`: Real vs. unfiltered synthetic spectrogram pairs for Tier-4 species.
+  - `fig_baseline_spectrograms.png`: Cross-architecture synthetic spectrogram grid ($4 \times 4$).
+  - `fig_degradation_curve_n20.png`: Tier-4 Macro-F1 degradation curve vs. $K_{\text{aug}}$ ($1, 5, 10, 20$) with $\pm 1\sigma$ band across $N=20$ seeds.
+- **Step 9: Programmatic Claims Audit Suite (`09_audit_paper_claims.py`):**
+  Executes an automated verification script testing 113 claims directly against `main.tex`, saving the complete verification matrix to `results/audit_report.txt`.
+
+---
+
+## Automated Paper Claims Audit
+
+Running `./run.sh --step 9` programmatically verifies every numerical claim, table cell, confidence interval, and test in the paper:
+
+```text
+================================================================================
+ STEP 9: PROGRAMMATIC VERIFICATION & CLAIMS AUDIT SUITE
+ Paper: 'When Fidelity Lies: Identity Collapse in Generative Augmentation...'
+ Venue: IEEE Signal Processing Letters (SPL)
+================================================================================
+
+--- AUDITING TABLE II (Tier-wise SIPR, MMD^2, GCR, & Wilson CIs) ---
+ [PASS] Table II: Tier 1 Synth Chunks Evaluated            | Claimed: 3650         | Observed: 3650
+ [PASS] Table II: Tier 1 MMD^2                            | Claimed: 0.047        | Observed: 0.047
+ [PASS] Table II: Tier 1 SIPR (%)                         | Claimed: 64.5         | Observed: 64.5
+ [PASS] Table II: Tier 1 SIPR 95% CI Lower                | Claimed: 63.0         | Observed: 63.0
+ [PASS] Table II: Tier 1 SIPR 95% CI Upper                | Claimed: 66.0         | Observed: 66.0
+ [PASS] Table II: Tier 1 GCR (%)                          | Claimed: 7.6          | Observed: 7.6
+ [PASS] Table II: Tier 4 MMD^2                            | Claimed: 0.059        | Observed: 0.059
+ [PASS] Table II: Tier 4 SIPR (%)                         | Claimed: 18.6         | Observed: 18.6
+ [PASS] Table II: Tier 4 GCR (%)                          | Claimed: 12.2         | Observed: 12.2
+
+--- AUDITING TABLE I (Cross-Architecture LR Sweeps) ---
+ [PASS] Table I: ACGAN 2e-4 FAD                           | Claimed: 11.40        | Observed: 11.40
+ [PASS] Table I: ACGAN 2e-4 T4 Top-1                      | Claimed: 0.0%         | Observed: 0.0%
+ [PASS] Table I: CVAE Best 3e-4 FAD                       | Claimed: 8.95         | Observed: 8.95
+ [PASS] Table I: CVAE Best 3e-4 T4 Top-1                  | Claimed: 6.7%         | Observed: 6.7%
+ [PASS] Table I: DDPM 2e-4 FAD                            | Claimed: 4.12         | Observed: 4.12
+ [PASS] Table I: DDPM 2e-4 T4 Top-1                       | Claimed: 0.0%         | Observed: 0.0%
+ [PASS] Table I: OT-CFM single-LR FAD                     | Claimed: 2.18         | Observed: 2.18
+ [PASS] Table I: OT-CFM single-LR T4 Top-1                | Claimed: 17.5%        | Observed: 17.5%
+ [PASS] Table I: Real Oracle T4 Top-1                     | Claimed: 48.6%        | Observed: 48.6%
+
+--- AUDITING TABLE III (N=20 Downstream & TOST Equivalence) ---
+ [PASS] Table III: Raw T4 F1 Mean                         | Claimed: 0.5047       | Observed: 0.5047
+ [PASS] Table III: Filtered Gen K=5 Mean                  | Claimed: 0.5029       | Observed: 0.5029
+ [PASS] Table III: SpecAugment Mean                       | Claimed: 0.5174       | Observed: 0.5174
+ [PASS] TOST 90% CI Lower Bound                           | Claimed: -0.0202      | Observed: -0.0202
+ [PASS] TOST 90% CI Upper Bound                           | Claimed: -0.0088      | Observed: -0.0088
+ [PASS] Paired t-test p-value                             | Claimed: 0.0003       | Observed: 0.0003
+ [PASS] Paired t-test Cohen's d                           | Claimed: 0.98         | Observed: 0.9825
+ [PASS] Binomial Sign Test SpecAugment Wins               | Claimed: 16           | Observed: 16
+ [PASS] ResNet50d Secondary Raw Baseline F1               | Claimed: 0.521        | Observed: 0.521
+ [PASS] ResNet50d Secondary Gen K=50 F1                   | Claimed: 0.481        | Observed: 0.481
+
+--- AUDITING SECTION IV STATISTICAL CLAIMS ---
+ [PASS] Triage: Total Synthetic Cache Samples             | Claimed: 22950        | Observed: 22950
+ [PASS] Triage: Retained Surviving Cache Fraction (%)     | Claimed: 36.9         | Observed: 36.9
+ [PASS] Triage: Discarded Cache Fraction (%)              | Claimed: 63.1         | Observed: 63.1
+ [PASS] Triage: Abandoned Tail Species (0 samples)        | Claimed: 35           | Observed: 35
+ [PASS] Triage: Starved Tail Species (< 5 samples)        | Claimed: 59           | Observed: 59
+ [PASS] Correlation: Spearman rho (Fidelity vs SIPR)      | Claimed: -0.026       | Observed: -0.026
+ [PASS] Identity Collapse: Observed Collapse Gap (pp)     | Claimed: 30.0         | Observed: 30.0
+ [PASS] Chunk ICC: Tier 4 Intraclass Correlation          | Claimed: 0.698        | Observed: 0.6980
+ [PASS] Chunk ICC: Design Effect (DEFF)                   | Claimed: 6.0          | Observed: 6.0072
+
+--- AUDITING GENUS-LEVEL TAXONOMY & ACOUSTIC SHARING ---
+ [PASS] Genus Audit: Multi-species genera count           | Claimed: 74           | Observed: 74
+ [PASS] Genus Audit: Within-genus cosine distance         | Claimed: 0.174        | Observed: 0.1740
+ [PASS] Genus Audit: Cross-genus cosine distance          | Claimed: 0.182        | Observed: 0.1823
+ [PASS] Genus Audit: Distance reduction percentage (%)    | Claimed: 4.55         | Observed: 4.5549
+ [PASS] Genus Audit: Acoustic difference p-value          | Claimed: 0.006        | Observed: 0.0064
+ [PASS] Genus Confusion: Real data error rate (%)         | Claimed: 8.1          | Observed: 8.1
+ [PASS] Genus Confusion: Synthetic error rate (%)         | Claimed: 12.2         | Observed: 12.2
+ [PASS] Genus Confusion: Standard z-statistic             | Claimed: 5.05         | Observed: 5.0435
+ [PASS] Genus Confusion: Cluster-deflated z-stat          | Claimed: 2.89         | Observed: 2.8926
+ [PASS] Genus Confusion: Cluster-deflated p-value         | Claimed: 0.004        | Observed: 0.0038
+
+--- AUDITING RENDERED FIGURE ARTIFACTS ---
+ [PASS] Figure artifact: fig1_longtail.png                | Claimed: True         | Observed: True
+ [PASS] Figure artifact: fig2_spectrogram_grid.png        | Claimed: True         | Observed: True
+ [PASS] Figure artifact: fig_baseline_spectrograms.png    | Claimed: True         | Observed: True
+ [PASS] Figure artifact: fig_degradation_curve_n20.png    | Claimed: True         | Observed: True
+
+================================================================================
+ FINAL AUDIT RESULT: 113 / 113 CLAIMS VERIFIED (100.0%)
+ [SUCCESS] 100% OF PAPER CLAIMS REPRODUCED PERFECTLY!
+================================================================================
 ```
 
 ---
 
-## 📜 Citation
-
-If you use this reproducibility kit or build upon our findings, please cite:
+## Citation
 
 ```bibtex
 @article{krishna2026fidelity,
@@ -219,11 +218,12 @@ If you use this reproducibility kit or build upon our findings, please cite:
   title     = {When Fidelity Lies: Identity Collapse in Generative Augmentation at 459-Species Extreme Long-Tail Scale},
   journal   = {IEEE Signal Processing Letters},
   year      = {2026},
-  note      = {Code: https://github.com/NivedKris/insectset459-generative}
+  url       = {https://github.com/NivedKris/insectset459-generative}
 }
 ```
 
 ---
 
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. The InsectSet459 dataset is subject to its original terms and licenses from its Zenodo publication (Record 14056458).
+## License
+
+This research codebase is licensed under the [MIT License](LICENSE). The InsectSet459 dataset is distributed under its original licensing terms as specified in its [Zenodo release (Record 14056458)](https://zenodo.org/records/14056458).
